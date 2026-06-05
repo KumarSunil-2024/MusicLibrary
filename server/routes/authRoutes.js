@@ -1,9 +1,17 @@
 const express = require("express");
 const router = express.Router();
 
-const { register, login } = require("../controllers/authController");
+const protect = require("../middleware/authMiddleware");
+
+const {
+  register,
+  login,
+  updateProfile,
+  deleteProfile,
+} = require("../controllers/authController");
 
 // Browser test route
+
 router.get("/", (req, res) => {
   res.json({
     success: true,
@@ -12,17 +20,35 @@ router.get("/", (req, res) => {
 });
 
 // Browser test route
+
 router.get("/register", (req, res) => {
   res.send("Use POST /api/auth/register");
 });
 
 // Browser test route
+
 router.get("/login", (req, res) => {
   res.send("Use POST /api/auth/login");
 });
 
-// Actual APIs
+// Auth APIs
+
 router.post("/register", register);
+
 router.post("/login", login);
+
+// Profile APIs
+
+router.put(
+  "/profile",
+  protect,
+  updateProfile
+);
+
+router.delete(
+  "/profile",
+  protect,
+  deleteProfile
+);
 
 module.exports = router;

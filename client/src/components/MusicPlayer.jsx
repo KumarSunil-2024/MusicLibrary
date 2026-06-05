@@ -1,94 +1,133 @@
-import {
-  Card,
-  CardContent,
-  Typography,
-  Avatar,
-  Button,
-  Stack,
-  Chip,
-} from "@mui/material";
-import Grid from "@mui/material/Grid"; // Import standard Grid from its own path
+import { useState, useEffect, useRef } from "react";
+// 💡 IMPORT YOUR CSS FILE HERE:
+import "./MusicPlayer.css"; 
 
 function MusicPlayer({ currentSong, nextSong, previousSong }) {
+  const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+
+  useEffect(() => {
+    if (currentSong && audioRef.current) {
+      audioRef.current.load();
+      if (isPlaying) {
+        audioRef.current.play().catch((err) => console.log("Playback error:", err));
+      }
+    }
+  }, [currentSong]);
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch((err) => console.log("Playback error:", err));
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration || 0);
+    }
+  };
+
+  const handleSliderChange = (e) => {
+    const newValue = parseFloat(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = newValue;
+      setCurrentTime(newValue);
+    }
+  };
+
+  const formatTime = (time) => {
+    if (isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
   if (!currentSong) {
     return (
-      <Card>
-        <CardContent>
-          <Typography variant="h5" align="center">
-            🎵 Select a Song
-          </Typography>
-        </CardContent>
-      </Card>
+      <div className="card border-0 bg-light rounded-3 text-center py-2 shadow-sm">
+        <p className="text-muted small mb-0 fw-medium">
+          🎧 Select a track from the library queue above to unlock playback.
+        </p>
+      </div>
     );
   }
 
   return (
-    <Card
-      elevation={3}
-      sx={{
-        borderRadius: 3,
-        p: 2,
-      }}
-    >
-      {/* Artwork */}{" "}
-      <Grid container spacing={2} alignItems="center">
-        <Grid size={{ xs: 12, sm: 2 }}>
-          <Avatar
-            variant="rounded"
+    <div className="premium-music-player card border-0 text-white p-2 shadow-lg">
+      <audio
+        ref={audioRef}
+        src={currentSong.previewUrl}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onEnded={() => {
+          setIsPlaying(false);
+          nextSong();
+        }}
+      />
+
+      <div className="row align-items-center g-2">
+        
+        {/* Left Section: Track Meta Details */}
+        <div className="col-12 col-sm-4 d-flex align-items-center gap-2">
+          <img
             src={currentSong.artworkUrl100}
-            sx={{
-              width: 90,
-              height: 90,
-            }}
+            alt={currentSong.trackName}
+            className={`img-fluid rounded-2 player-art ${isPlaying ? "art-spinning" : ""}`}
+            style={{ width: "40px", height: "40px", objectFit: "cover" }}
           />
-        </Grid>
+          <div className="text-truncate" style={{ maxWidth: "80%" }}>
+            <h6 className="text-white mb-0 small fw-bold text-truncate">{currentSong.trackName}</h6>
+            <span className="text-muted small-caption text-truncate d-block">{currentSong.artistName}</span>
+          </div>
+        </div>
 
-        {/* Song Info */}
-        <Grid size={{ xs: 12, sm: 3 }}>
-          <Chip
-            label="NOW PLAYING"
-            color="success"
-            size="small"
-            sx={{ mb: 1 }}
-          />
+        {/* Right Section: Core Media Controllers & Inline Horizontal Timeline */}
+        <div className="col-12 col-sm-8 d-flex align-items-center justify-content-sm-end justify-content-center gap-3 flex-wrap flex-sm-nowrap">
+          
+          {/* Controls Button Cluster */}
+          <div className="d-flex align-items-center gap-1">
+            <button className="btn btn-player-action btn-sm" onClick={previousSong}>
+              ⏮
+            </button>
+            <button className="btn btn-play-pause rounded-circle d-flex align-items-center justify-content-center" onClick={togglePlay}>
+              {isPlaying ? "⏸" : "▶"}
+            </button>
+            <button className="btn btn-player-action btn-sm" onClick={nextSong}>
+              ⏭
+            </button>
+          </div>
 
-          <Typography variant="h6" noWrap>
-            {currentSong.trackName}
-          </Typography>
+          {/* Integrated Slider Timeline Wrapper */}
+          <div className="timeline-container d-flex align-items-center gap-2 flex-grow-1 flex-sm-grow-0" style={{ minWidth: "180px", maxWidth: "320px" }}>
+            <span className="timestamp text-muted">{formatTime(currentTime)}</span>
+            <input
+              type="range"
+              className="form-range player-slider"
+              min={0}
+              max={duration || 30}
+              step={0.1}
+              value={currentTime}
+              onChange={handleSliderChange}
+            />
+            <span className="timestamp text-muted">{formatTime(duration || 30)}</span>
+          </div>
 
-          <Typography variant="body2" color="text.secondary">
-            {currentSong.artistName}
-          </Typography>
-        </Grid>
+        </div>
 
-        {/* Audio */}
-        <Grid size={{ xs: 12, sm: 4 }}>
-          <audio
-            key={currentSong.trackId}
-            controls
-            style={{
-              width: "100%",
-            }}
-            onEnded={nextSong}
-          >
-            <source src={currentSong.previewUrl} type="audio/mpeg" />
-          </audio>
-        </Grid>
-
-        {/* Buttons */}
-        <Grid size={{ xs: 12, sm: 3 }}>
-          <Stack direction="row" spacing={1} justifyContent="center">
-            <Button variant="outlined" onClick={previousSong}>
-              Prev
-            </Button>
-
-            <Button variant="contained" onClick={nextSong}>
-              Next
-            </Button>
-          </Stack>
-        </Grid>
-      </Grid>
-    </Card>
+      </div>
+    </div>
   );
 }
 

@@ -8,184 +8,232 @@ import {
   Divider,
   List,
   ListItem,
-  ListItemText,
+  TextField,
+  Button,
   Chip,
 } from "@mui/material";
+
 import { Person } from "@mui/icons-material";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 function Profile() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
+
+  const storedUser =
+    JSON.parse(
+      localStorage.getItem("user")
+    );
+
+  const [name, setName] =
+    useState(
+      storedUser?.name || ""
+    );
+
+  const [phone, setPhone] =
+    useState(
+      storedUser?.phone || ""
+    );
+
+  const updateProfile =
+    async () => {
+      try {
+        const res =
+          await api.put(
+            "/auth/profile",
+            {
+              name,
+              phone,
+            }
+          );
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify(
+            res.data
+          )
+        );
+
+        alert(
+          "Profile Updated"
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+  const deleteUser =
+    async () => {
+      const confirmDelete =
+        window.confirm(
+          "Delete Account?"
+        );
+
+      if (
+        !confirmDelete
+      )
+        return;
+
+      try {
+        await api.delete(
+          "/auth/profile"
+        );
+
+        localStorage.removeItem(
+          "user"
+        );
+
+        localStorage.removeItem(
+          "token"
+        );
+
+        navigate("/");
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
   return (
-    <Container maxWidth="xs">
-      {/* Reduced margins from mt:4 to mt:2 */}
-      <Box
-        sx={{
-          mt: 2,
-          mb: 2,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Card elevation={2} sx={{ borderRadius: 1.5, width: "100%", p: 0.5 }}>
-          <CardContent sx={{ "&:last-child": { pb: 0.5 }, p: 1 }}>
-            {/* Small Header Avatar Section */}
+    <Container maxWidth="sm">
+
+      <Box sx={{ mt: 3 }}>
+
+        <Card>
+
+          <CardContent>
+
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                mb: 1,
+                textAlign:
+                  "center",
+                mb: 2,
               }}
             >
+
               <Avatar
-                sx={{ m: 0.5, bgcolor: "primary.main", width: 36, height: 36 }}
+                sx={{
+                  bgcolor:
+                    "primary.main",
+                  mx: "auto",
+                }}
               >
-                <Person fontSize="small" />
+                <Person />
               </Avatar>
+
               <Typography
-                component="h1"
-                variant="h6"
-                fontWeight="bold"
-                fontSize="1.1rem"
+                variant="h5"
+                mt={1}
               >
                 User Profile
               </Typography>
+
             </Box>
 
             <Divider />
 
-            {/* Hyper-Compact Line-by-Line List Layout */}
-            <List disablePadding>
-              {/* Name Row */}
-              <ListItem sx={{ px: 0.5, py: 0.5 }} dense>
-                <ListItemText
-                  primary={
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight="bold"
-                      fontSize="0.7rem"
-                    >
-                      Name
-                    </Typography>
-                  }
-                  secondary={
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontSize="0.85rem"
-                    >
-                      {user?.name || "N/A"}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-              <Divider component="li" />
+            <List>
 
-              {/* Email Row */}
-              <ListItem sx={{ px: 0.5, py: 0.5 }} dense>
-                <ListItemText
-                  primary={
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight="bold"
-                      fontSize="0.7rem"
-                    >
-                      Email
-                    </Typography>
-                  }
-                  secondary={
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontSize="0.85rem"
-                      sx={{ wordBreak: "break-all" }}
-                    >
-                      {user?.email || "N/A"}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-              <Divider component="li" />
+              <ListItem>
 
-              {/* Phone Row */}
-              <ListItem sx={{ px: 0.5, py: 0.5 }} dense>
-                <ListItemText
-                  primary={
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight="bold"
-                      fontSize="0.7rem"
-                    >
-                      Phone
-                    </Typography>
-                  }
-                  secondary={
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontSize="0.85rem"
-                    >
-                      {user?.phone || "N/A"}
-                    </Typography>
+                <TextField
+                  fullWidth
+                  label="Name"
+                  value={name}
+                  onChange={(
+                    e
+                  ) =>
+                    setName(
+                      e.target
+                        .value
+                    )
                   }
                 />
-              </ListItem>
-              <Divider component="li" />
 
-              {/* Role Row */}
-              <ListItem
-                sx={{
-                  px: 0.5,
-                  py: 0.5,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-                dense
-              >
-                <ListItemText
-                  primary={
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      fontWeight="bold"
-                      fontSize="0.7rem"
-                    >
-                      Role
-                    </Typography>
+              </ListItem>
+
+              <ListItem>
+
+                <TextField
+                  fullWidth
+                  label="Email"
+                  value={
+                    storedUser?.email
                   }
-                  secondary={
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      fontSize="0.85rem"
-                      fontWeight="medium"
-                    >
-                      {user?.role || "USER"}
-                    </Typography>
+                  disabled
+                />
+
+              </ListItem>
+
+              <ListItem>
+
+                <TextField
+                  fullWidth
+                  label="Phone"
+                  value={phone}
+                  onChange={(
+                    e
+                  ) =>
+                    setPhone(
+                      e.target
+                        .value
+                    )
                   }
                 />
+
+              </ListItem>
+
+              <ListItem>
+
                 <Chip
-                  label={user?.role || "USER"}
-                  size="small"
-                  color={user?.role === "ADMIN" ? "error" : "default"}
-                  variant="outlined"
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: "0.65rem",
-                    height: "18px",
-                  }}
+                  label={
+                    storedUser?.role
+                  }
+                  color="primary"
                 />
+
               </ListItem>
+
             </List>
+
+            <Box
+              sx={{
+                display:
+                  "flex",
+                gap: 2,
+                mt: 2,
+              }}
+            >
+
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={
+                  updateProfile
+                }
+              >
+                Update Profile
+              </Button>
+
+              <Button
+                variant="contained"
+                color="error"
+                fullWidth
+                onClick={
+                  deleteUser
+                }
+              >
+                Delete User
+              </Button>
+
+            </Box>
+
           </CardContent>
+
         </Card>
+
       </Box>
+
     </Container>
   );
 }
