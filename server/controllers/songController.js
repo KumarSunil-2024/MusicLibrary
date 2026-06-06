@@ -1,127 +1,125 @@
-const Song =
-require("../models/Song");
+const Song = require("../models/Song");
 
-exports.createSong =
-async(req,res)=>{
+// Create Song
 
- try{
+exports.createSong = async (req, res) => {
+  try {
+    const song = await Song.create(req.body);
 
-  const song =
-  await Song.create(
-   req.body
-  );
-
-  res.status(201)
-  .json(song);
-
- }
- catch(error){
-
-  res.status(500)
-  .json({
-   message:error.message
-  });
-
- }
-
+    res.status(201).json(song);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
-exports.getSongs =
-async(req,res)=>{
+// User Songs (Visible Only)
 
- try{
+exports.getSongs = async (req, res) => {
+  try {
+    const songs = await Song.find({
+      visibility: true,
+    });
 
-  const songs =
-  await Song.find({
-   visibility:true
-  });
-
-  res.json(songs);
-
- }
- catch(error){
-
-  res.status(500)
-  .json({
-   message:error.message
-  });
-
- }
-
+    res.json(songs);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
-exports.getSongById =
-async(req,res)=>{
+// Admin Songs (All)
 
- try{
+exports.getAllSongs = async (req, res) => {
+  try {
+    const songs = await Song.find();
 
-  const song =
-  await Song.findById(
-   req.params.id
-  );
-
-  res.json(song);
-
- }
- catch(error){
-
-  res.status(500)
-  .json({
-   message:error.message
-  });
-
- }
-
+    res.json(songs);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
-exports.updateSong =
-async(req,res)=>{
+// Get Single Song
 
- try{
+exports.getSongById = async (req, res) => {
+  try {
+    const song = await Song.findById(req.params.id);
 
-  const song =
-  await Song.findByIdAndUpdate(
-   req.params.id,
-   req.body,
-   {new:true}
-  );
+    if (!song) {
+      return res.status(404).json({
+        message: "Song Not Found",
+      });
+    }
 
-  res.json(song);
-
- }
- catch(error){
-
-  res.status(500)
-  .json({
-   message:error.message
-  });
-
- }
-
+    res.json(song);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
-exports.deleteSong =
-async(req,res)=>{
+// Update Song
 
- try{
+exports.updateSong = async (req, res) => {
+  try {
+    const song = await Song.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
 
-  await Song.findByIdAndDelete(
-   req.params.id
-  );
+    res.json(song);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
-  res.json({
-   message:
-   "Song Deleted"
-  });
+// Delete Song
 
- }
- catch(error){
+exports.deleteSong = async (req, res) => {
+  try {
+    await Song.findByIdAndDelete(req.params.id);
 
-  res.status(500)
-  .json({
-   message:error.message
-  });
+    res.json({
+      message: "Song Deleted",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
- }
+// Toggle Visibility
 
+exports.toggleVisibility = async (req, res) => {
+  try {
+    const song = await Song.findById(req.params.id);
+
+    if (!song) {
+      return res.status(404).json({
+        message: "Song Not Found",
+      });
+    }
+
+    song.visibility = !song.visibility;
+
+    await song.save();
+
+    res.json({
+      message: "Visibility Updated",
+      visibility: song.visibility,
+      song,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };

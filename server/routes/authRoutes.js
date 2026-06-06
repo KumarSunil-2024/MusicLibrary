@@ -6,11 +6,12 @@ const protect = require("../middleware/authMiddleware");
 const {
   register,
   login,
+  getProfile,
   updateProfile,
   deleteProfile,
 } = require("../controllers/authController");
 
-// Browser test route
+// Test
 
 router.get("/", (req, res) => {
   res.json({
@@ -19,36 +20,18 @@ router.get("/", (req, res) => {
   });
 });
 
-// Browser test route
-
-router.get("/register", (req, res) => {
-  res.send("Use POST /api/auth/register");
-});
-
-// Browser test route
-
-router.get("/login", (req, res) => {
-  res.send("Use POST /api/auth/login");
-});
-
-// Auth APIs
+// Auth
 
 router.post("/register", register);
 
 router.post("/login", login);
 
-// Profile APIs
+// Profile
 
-router.put(
-  "/profile",
-  protect,
-  updateProfile
-);
+router.get("/profile", protect, getProfile);
 
-router.delete(
-  "/profile",
-  protect,
-  deleteProfile
-);
+router.put("/profile", protect, updateProfile);
+
+router.delete("/profile", protect, deleteProfile);
 
 module.exports = router;

@@ -1,13 +1,15 @@
 const authService = require("../services/authService");
 const User = require("../models/User");
 
+// Register
+
 const register = async (req, res) => {
   try {
     const user = await authService.registerUser(req.body);
 
     res.status(201).json({
       success: true,
-      message: "User Registered",
+      message: "User Registered Successfully",
       user,
     });
   } catch (error) {
@@ -18,11 +20,13 @@ const register = async (req, res) => {
   }
 };
 
+// Login
+
 const login = async (req, res) => {
   try {
     const result = await authService.loginUser(
       req.body.email,
-      req.body.password,
+      req.body.password
     );
 
     res.status(200).json({
@@ -37,40 +41,84 @@ const login = async (req, res) => {
   }
 };
 
-// Update Profile
+// Get Profile
 
-const updateProfile = async (req, res) => {
+const getProfile = async (req, res) => {
   try {
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      {
-        name: req.body.name,
-        phone: req.body.phone,
-      },
-      {
-        new: true,
-      },
-    );
+    const user = await User.findById(req.user.id).select("-password");
 
-    res.json(user);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User Not Found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
   } catch (error) {
     res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
 };
 
-// Delete User
+// Update Profile
 
-const deleteProfile = async (req, res) => {
+const updateProfile = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.user.id);
+    const user = await User.findById(req.user.id);
 
-    res.json({
-      message: "Account Deleted",
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User Not Found",
+      });
+    }
+
+    user.name = req.body.name || user.name;
+    user.phone = req.body.phone || user.phone;
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Profile Updated Successfully",
+      user: updatedUser,
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Delete Profile
+
+const deleteProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User Not Found",
+      });
+    }
+
+    await User.findByIdAndDelete(req.user.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Account Deleted Successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
       message: error.message,
     });
   }
@@ -79,6 +127,7 @@ const deleteProfile = async (req, res) => {
 module.exports = {
   register,
   login,
+  getProfile,
   updateProfile,
   deleteProfile,
 };

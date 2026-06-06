@@ -1,11 +1,12 @@
-const adminOnly = (req, res, next) => {
+const admin = (req, res, next) => {
   if (req.user.role !== "ADMIN") {
     return res.status(403).json({
-      message: "Admin Only",
+      success: false,
+      message: "Admin Access Only",
     });
   }
 
   next();
 };
 
-module.exports = adminOnly;
+module.exports = admin;

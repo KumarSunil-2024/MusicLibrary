@@ -25,23 +25,47 @@ function Register() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
 
-    if (user.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
+  setError("");
 
-    try {
-      await api.post("/auth/register", user);
-      alert("Registration Successful");
-      navigate("/");
-    } catch (error) {
-      setError(error.response?.data?.message || "Registration Failed");
-    }
-  };
+  if (!user.name.trim()) {
+    setError("Name is required");
+    return;
+  }
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(user.email)) {
+    setError("Invalid email format");
+    return;
+  }
+
+  if (!/^[0-9]{10}$/.test(user.phone)) {
+    setError("Phone number must be 10 digits");
+    return;
+  }
+
+  if (user.password.length < 6) {
+    setError(
+      "Password must be at least 6 characters"
+    );
+    return;
+  }
+
+  try {
+    await api.post("/auth/register", user);
+
+    alert("Registration Successful");
+
+    navigate("/");
+  } catch (error) {
+    setError(
+      error.response?.data?.message ||
+      "Registration Failed"
+    );
+  }
+};
   return (
     <Container maxWidth="xs">
       <Box sx={{ mt: 3, mb: 3, display: "flex", flexDirection: "column", alignItems: "center" }}>

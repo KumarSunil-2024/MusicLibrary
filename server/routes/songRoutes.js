@@ -1,47 +1,33 @@
-const express =
-require("express");
+const express = require("express");
 
-const router =
-express.Router();
+const router = express.Router();
 
 const {
+  createSong,
+  getSongs,
+  getAllSongs,
+  getSongById,
+  updateSong,
+  deleteSong,
+  toggleVisibility,
+} = require("../controllers/songController");
 
- createSong,
- getSongs,
- getSongById,
- updateSong,
- deleteSong
+// User Routes
 
-}
-=
-require(
-"../controllers/songController"
-);
+router.get("/", getSongs);
 
-router.post(
-"/",
-createSong
-);
+router.get("/:id", getSongById);
 
-router.get(
-"/",
-getSongs
-);
+// Admin Routes
 
-router.get(
-"/:id",
-getSongById
-);
+router.post("/", createSong);
 
-router.put(
-"/:id",
-updateSong
-);
+router.get("/admin/all", getAllSongs);
 
-router.delete(
-"/:id",
-deleteSong
-);
+router.put("/:id", updateSong);
 
-module.exports =
-router;
+router.put("/:id/visibility", toggleVisibility);
+
+router.delete("/:id", deleteSong);
+
+module.exports = router;
