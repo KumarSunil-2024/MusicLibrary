@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const { protect, admin } = require("../middleware/authMiddleware"); // 🎯 FIXED: Imports your middleware guards
+const { protect, admin } = require("../middleware/authMiddleware");
 const {
-  createSong,
   getSongs,
   getAllSongs,
   getSongById,
@@ -12,15 +11,20 @@ const {
   toggleVisibility,
 } = require("../controllers/songController");
 
+// 🎯 MINIMAL FIX: Import the notification-enabled handler from your admin controller
+const { adminAddSong } = require("../controllers/adminController");
+
 // 1. Core User Discovery Actions (Open to logged-in accounts)
 router.get("/", protect, getSongs);
 router.get("/:id", protect, getSongById);
 
-// 2. Core Admin Administration Framework Rules (Strictly locked by role check flags)
-router.post("/", protect, admin, createSong);
-router.get("/admin/all", protect, admin, getAllSongs); // 🎯 FIXED: No longer vulnerable to standard user snooping
+// 2. Core Admin Administration Framework Rules
+// 🎯 MINIMAL FIX: Swapped out 'createSong' for 'adminAddSong'
+router.post("/", protect, admin, adminAddSong);
+
+router.get("/admin/all", protect, admin, getAllSongs);
 router.put("/:id", protect, admin, updateSong);
-router.put("/:id/visibility", protect, admin, toggleVisibility); // 🎯 FIXED: Securely protected toggle
+router.put("/:id/visibility", protect, admin, toggleVisibility);
 router.delete("/:id", protect, admin, deleteSong);
 
 module.exports = router;
