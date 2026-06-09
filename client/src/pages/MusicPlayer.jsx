@@ -1,125 +1,141 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { Play, Pause, SkipForward, SkipBack, Shuffle, Repeat, Square } from "lucide-react";
 
-function MusicPlayer({
-  currentSong,
-  nextSong,
-  previousSong,
-  songs,
-  currentIndex,
-}) {
+function MusicPlayer({ currentSong, nextSong, previousSong }) {
   const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [timeline, setTimeline] = useState({ current: 0, total: 0 });
+  const [modes, setModes] = useState({ repeat: false, shuffle: false });
 
-  const [repeat, setRepeat] = useState(false);
-  const [shuffle, setShuffle] = useState(false);
+  // Auto-play toggle on source track change
+  useEffect(() => {
+    const player = audioRef.current;
+    if (player && currentSong?.previewUrl) {
+      player.load();
+      player.play()
+        .then(() => setIsPlaying(true))
+        .catch(err => console.log("Playback interaction paused:", err.message));
+    } else {
+      setIsPlaying(false);
+    }
+  }, [currentSong]);
+
+  const togglePlay = useCallback(() => {
+    if (!audioRef.current) return;
+    if (isPlaying) audioRef.current.pause();
+    else audioRef.current.play().catch(e => console.log(e));
+    setIsPlaying(!isPlaying);
+  }, [isPlaying]);
+
+  const stopSong = useCallback(() => {
+    if (!audioRef.current) return;
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+    setIsPlaying(false);
+    setTimeline(prev => ({ ...prev, current: 0 }));
+  }, []);
+
+  const handleAudioMeta = useCallback((e) => {
+    setTimeline({
+      current: e.target.currentTime,
+      total: e.target.duration || 0
+    });
+  }, []);
+
+  const handleSeek = useCallback((e) => {
+    const val = Number(e.target.value);
+    if (audioRef.current) audioRef.current.currentTime = val;
+    setTimeline(prev => ({ ...prev, current: val }));
+  }, []);
+
+  const handleSongEnd = useCallback(() => {
+    if (modes.repeat && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(e => console.log(e));
+    } else {
+      nextSong();
+    }
+  }, [modes.repeat, nextSong]);
+
+  const formatTime = useCallback((time) => {
+    if (isNaN(time)) return "0:00";
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  }, []);
 
   if (!currentSong) {
     return (
-      <div className="card shadow-sm">
-        <div className="card-body text-center">
-          <h4>🎵 Music Player</h4>
-          <p className="text-muted">Select a song from sidebar</p>
-        </div>
+      <div className="card text-center border p-3 shadow-sm bg-white" style={{ borderRadius: "10px" }}>
+        <h6 className="fw-bold text-muted m-0">No Track Selected</h6>
       </div>
     );
   }
 
-  const stopSong = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  };
-
-  const handleSongEnd = () => {
-    if (repeat && audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
-      return;
-    }
-
-    nextSong();
-  };
-
-  const shuffleSong = () => {
-    if (songs.length === 0) return;
-
-    const random = Math.floor(Math.random() * songs.length);
-
-    window.location.href = "#";
-  };
-
   return (
-    <div className="card shadow-sm mb-3">
-      <div className="card-body">
-        <div className="text-center">
-          <img
-            src={currentSong.artworkUrl100}
-            alt=""
-            width="150"
-            className="rounded mb-3"
-          />
+    <div className="card border shadow-sm mt-auto bg-white" style={{ borderRadius: "12px" }}>
+      <audio
+        ref={audioRef}
+        key={currentSong.trackId}
+        src={currentSong.previewUrl}
+        onTimeUpdate={handleAudioMeta}
+        onLoadedMetadata={handleAudioMeta}
+        onEnded={handleSongEnd}
+      />
 
-          <h4>{currentSong.trackName}</h4>
-
-          <p className="text-muted">{currentSong.artistName}</p>
-        </div>
-
-        <audio
-          ref={audioRef}
-          key={currentSong.trackId}
-          controls
-          className="w-100"
-          onEnded={handleSongEnd}
-        >
-          <source src={currentSong.previewUrl} type="audio/mpeg" />
-        </audio>
-
-        <div className="d-flex justify-content-center gap-2 mt-3">
-          <button className="btn btn-secondary" onClick={previousSong}>
-            ⏮ Prev
-          </button>
-
-          <button className="btn btn-danger" onClick={stopSong}>
-            ⏹ Stop
-          </button>
-
-          <button
-            className={`btn ${repeat ? "btn-warning" : "btn-outline-warning"}`}
-            onClick={() => setRepeat(!repeat)}
-          >
-            🔁 Repeat
-          </button>
-
-          <button
-            className={`btn ${shuffle ? "btn-info" : "btn-outline-info"}`}
-            onClick={() => setShuffle(!shuffle)}
-          >
-            🔀 Shuffle
-          </button>
-
-          <button className="btn btn-success" onClick={nextSong}>
-            Next ⏭
-          </button>
-        </div>
-
-        <hr />
-
-        <h6>Up Next</h6>
-
-        {songs.slice(currentIndex + 1, currentIndex + 4).map((song) => (
-          <div key={song.trackId} className="d-flex align-items-center mb-2">
+      <div className="card-body p-3">
+        <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+          
+          {/* Identity Info Panel */}
+          <div className="d-flex align-items-center gap-2 text-center text-md-start" style={{ minWidth: "200px" }}>
             <img
-              src={song.artworkUrl60}
-              width="40"
-              className="rounded me-2"
-              alt=""
+              src={currentSong.artworkUrl100 || "/default-music.png"}
+              alt="Art"
+              style={{ width: "46px", height: "46px", borderRadius: "6px", objectFit: "cover" }}
+              onError={e => e.target.src = "/default-music.png"}
             />
-
-            <div>
-              <small>{song.trackName}</small>
+            <div style={{ maxWidth: "150px", overflow: "hidden" }}>
+              <p className="mb-0 fw-bold text-dark text-truncate text-start" style={{ fontSize: "0.85rem" }}>{currentSong.trackName}</p>
+              <small className="text-muted text-truncate d-block text-start" style={{ fontSize: "0.75rem" }}>{currentSong.artistName}</small>
             </div>
           </div>
-        ))}
+
+          {/* Central Controls & Linear Input Timeline */}
+          <div className="d-flex flex-column align-items-center gap-1 flex-grow-1 w-100" style={{ maxWidth: "440px" }}>
+            <div className="d-flex align-items-center gap-3 mb-1">
+              <button className="btn btn-link p-1 border-0 bg-transparent" style={{ color: modes.shuffle ? "#10b981" : "#9ca3af" }} onClick={() => setModes(p => ({ ...p, shuffle: !p.shuffle }))}>
+                <Shuffle size={16} />
+              </button>
+              <button className="btn btn-link p-1 border-0 bg-transparent text-secondary" onClick={previousSong}>
+                <SkipBack size={18} fill="#6b7280" />
+              </button>
+              <button className="btn d-flex align-items-center justify-content-center shadow-sm border-0" style={{ width: "38px", height: "38px", borderRadius: "50%", backgroundColor: "#1e3a8a", color: "#ffffff" }} onClick={togglePlay}>
+                {isPlaying ? <Pause size={16} fill="#ffffff" /> : <Play size={16} fill="#ffffff" className="ms-0.5" />}
+              </button>
+              <button className="btn btn-link p-1 border-0 bg-transparent text-secondary" onClick={nextSong}>
+                <SkipForward size={18} fill="#6b7280" />
+              </button>
+              <button className="btn btn-link p-1 border-0 bg-transparent" style={{ color: modes.repeat ? "#10b981" : "#9ca3af" }} onClick={() => setModes(p => ({ ...p, repeat: !p.repeat }))}>
+                <Repeat size={16} />
+              </button>
+              <button className="btn btn-link p-1 border-0 bg-transparent text-danger opacity-70" onClick={stopSong}>
+                <Square size={14} fill="#ef4444" />
+              </button>
+            </div>
+
+            <div className="d-flex align-items-center gap-2 w-100">
+              <span className="text-muted" style={{ fontSize: "0.7rem", minWidth: "30px", textAlign: "right" }}>{formatTime(timeline.current)}</span>
+              <input type="range" className="form-range flex-grow-1" min="0" max={timeline.total} value={timeline.current} onChange={handleSeek} style={{ height: "4px", cursor: "pointer", accentColor: "#1e3a8a" }} />
+              <span className="text-muted" style={{ fontSize: "0.7rem", minWidth: "30px" }}>{formatTime(timeline.total)}</span>
+            </div>
+          </div>
+
+          {/* Right Utility Badge */}
+          <div className="d-none d-md-flex align-items-center gap-2 text-secondary" style={{ width: "120px", justifyContent: "flex-end" }}>
+            <span className="badge bg-light text-secondary border fw-medium" style={{ fontSize: "0.6rem", letterSpacing: "0.5px" }}>HQ STREAM</span>
+          </div>
+
+        </div>
       </div>
     </div>
   );

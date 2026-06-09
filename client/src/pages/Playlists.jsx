@@ -6,186 +6,110 @@ function Playlists() {
   const [name, setName] = useState("");
   const [search, setSearch] = useState("");
 
-  // Synchronizes with the external system (API Backend) safely on mount
   const fetchPlaylists = async () => {
     try {
       const res = await api.get("/playlists");
       setPlaylists(res.data);
-    } catch (error) {
-      console.error("Error fetching playlists:", error);
-    }
+    } catch (err) { console.error("Error fetching playlists:", err); }
   };
 
-  useEffect(() => {
-    fetchPlaylists();
-  }, []);
+  useEffect(() => { fetchPlaylists(); }, []);
 
-  const createPlaylist = async () => {
-    if (!name.trim()) {
-      alert("Enter Playlist Name");
-      return;
-    }
-
+  const handleAction = async (method, url, data = null) => {
     try {
-      await api.post("/playlists", { name });
-      setName("");
-      await fetchPlaylists();
-    } catch (error) {
-      console.error("Error creating playlist:", error);
-    }
+      await api[method](url, data);
+      fetchPlaylists();
+    } catch (err) { console.error(`Action failed (${url}):`, err); }
   };
 
-  const renamePlaylist = async (id) => {
+  const createPlaylist = () => {
+    if (!name.trim()) return alert("Enter Playlist Name");
+    handleAction("post", "/playlists", { name });
+    setName("");
+  };
+
+  const renamePlaylist = (id) => {
     const newName = prompt("Enter New Playlist Name");
-    if (!newName || !newName.trim()) return;
-
-    try {
-      await api.put(`/playlists/${id}`, { name: newName });
-      await fetchPlaylists();
-    } catch (error) {
-      console.error("Error renaming playlist:", error);
-    }
+    if (newName?.trim()) handleAction("put", `/playlists/${id}`, { name: newName });
   };
 
-  const deletePlaylist = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this playlist?"))
-      return;
-
-    try {
-      await api.delete(`/playlists/${id}`);
-      await fetchPlaylists();
-    } catch (error) {
-      console.error("Error deleting playlist:", error);
-    }
-  };
-
-  const removeSong = async (playlistId, songId) => {
-    try {
-      await api.put(`/playlists/${playlistId}/remove-song/${songId}`);
-      await fetchPlaylists();
-    } catch (error) {
-      console.error("Error removing song:", error);
+  const deletePlaylist = (id) => {
+    if (window.confirm("Are you sure you want to delete this playlist?")) {
+      handleAction("delete", `/playlists/${id}`);
     }
   };
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">🎵 My Playlists</h2>
-
-      {/* Create Playlist Layout */}
-      <div className="card shadow p-3 mb-4">
-        <h5>Create Playlist</h5>
-        <div className="d-flex gap-2">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Playlist Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <button className="btn btn-success" onClick={createPlaylist}>
-            Create
-          </button>
+    <div className="container py-3" style={{ color: "#2c3e50" }}>
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+        <div>
+          <h2 className="fw-bold m-0" style={{ letterSpacing: "-0.5px", color: "#1e3a8a" }}>🎧 My Playlists</h2>
+          <small className="text-muted">Manage and filter your musical collections easily.</small>
+        </div>
+        <div style={{ maxWidth: "300px", width: "100%" }}>
+          <input type="text" className="form-control form-control-sm border shadow-sm" placeholder="🔍 Search tracks inside..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
 
-      {/* Search Filter */}
-      <input
-        type="text"
-        className="form-control mb-4"
-        placeholder="Search Song In Playlist"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="row g-3">
+        <div className="col-md-4">
+          <div className="card p-3 shadow-sm border" style={{ backgroundColor: "#f8fafc", borderRadius: "10px" }}>
+            <h6 className="fw-bold mb-2" style={{ color: "#1e3a8a" }}>New Collection</h6>
+            <div className="d-flex flex-column gap-2">
+              <input type="text" className="form-control form-control-sm border" placeholder="Playlist Title..." value={name} onChange={(e) => setName(e.target.value)} />
+              <button className="btn btn-sm btn-success fw-bold py-1.5" onClick={createPlaylist}>＋ Create Playlist</button>
+            </div>
+          </div>
+        </div>
 
-      {/* Playlists Render Loops */}
-      {playlists.length === 0 ? (
-        <div className="alert alert-info">No Playlists Found</div>
-      ) : (
-        playlists.map((playlist) => {
-          // FIXED: Computes variables dynamically inside the render loop on-the-fly.
-          // This avoids using a secondary useEffect hook with synchronous cascading renders.
-          const filteredSongs = playlist.songs
-            ? playlist.songs.filter((song) =>
-                song.trackName?.toLowerCase().includes(search.toLowerCase()),
-              )
-            : [];
+        <div className="col-md-8">
+          {playlists.length === 0 ? (
+            <div className="text-center py-4 rounded border border-secondary border-dashed" style={{ backgroundColor: "#f8fafc" }}>
+              <h6 className="m-0 text-muted">No custom playlists created yet.</h6>
+            </div>
+          ) : (
+            playlists.map((p) => {
+              const query = search.toLowerCase();
+              const filteredSongs = (p.songs || []).filter(s => s?.trackName?.toLowerCase().includes(query));
 
-          return (
-            <div key={playlist._id} className="card shadow-sm mb-4">
-              <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div>
-                    <h4>{playlist.name}</h4>
-                    <p className="text-muted mb-0">
-                      Songs: {playlist.songs ? playlist.songs.length : 0}
-                    </p>
+              return (
+                <div key={p._id} className="card border mb-3 shadow-sm" style={{ borderRadius: "10px", overflow: "hidden" }}>
+                  <div className="px-3 py-2 d-flex justify-content-between align-items-center border-bottom" style={{ backgroundColor: "#edf2f7" }}>
+                    <div>
+                      <h5 className="fw-bold m-0 d-inline-block text-dark me-2">{p.name}</h5>
+                      <span className="badge bg-secondary rounded-pill" style={{ fontSize: "0.75rem" }}>{p.songs?.filter(Boolean).length || 0} items</span>
+                    </div>
+                    <div className="d-flex gap-1">
+                      <button className="btn btn-sm px-2 py-0.5 btn-outline-primary" style={{ fontSize: "0.8rem" }} onClick={() => renamePlaylist(p._id)}>Rename</button>
+                      <button className="btn btn-sm px-2 py-0.5 btn-danger" style={{ fontSize: "0.8rem" }} onClick={() => deletePlaylist(p._id)}>Delete</button>
+                    </div>
                   </div>
 
-                  <div>
-                    <button
-                      className="btn btn-warning btn-sm me-2"
-                      onClick={() => renamePlaylist(playlist._id)}
-                    >
-                      Rename
-                    </button>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => deletePlaylist(playlist._id)}
-                    >
-                      Delete
-                    </button>
+                  <div className="card-body p-2" style={{ backgroundColor: "#ffffff" }}>
+                    {filteredSongs.length === 0 ? (
+                      <p className="text-muted m-0 py-2 text-center" style={{ fontSize: "0.85rem" }}>No matching songs found</p>
+                    ) : (
+                      filteredSongs.map((song, idx) => (
+                        <div key={`${p._id}-${song._id || song.trackId}`} className="d-flex justify-content-between align-items-center p-1 rounded mb-1 border-bottom">
+                          <div className="d-flex align-items-center gap-2">
+                            <small className="text-muted fw-bold ps-1" style={{ width: "15px" }}>{idx + 1}</small>
+                            <img src={song.artworkUrl || "/default-music.png"} alt="" style={{ width: "32px", height: "32px", borderRadius: "4px", objectFit: "cover" }} onError={(e) => { e.target.src = "/default-music.png"; }} />
+                            <div>
+                              <p className="mb-0 fw-bold text-dark" style={{ fontSize: "0.9rem", lineHeight: "1.2" }}>{song.trackName}</p>
+                              <small className="text-muted d-block" style={{ fontSize: "0.75rem" }}>{song.artistName}</small>
+                            </div>
+                          </div>
+                          <button className="btn btn-sm btn-link text-decoration-none text-danger p-0 pe-1" style={{ fontSize: "0.8rem" }} onClick={() => handleAction("put", `/playlists/${p._id}/remove-song/${song._id || song.trackId}`)}>Remove</button>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
-
-                <hr />
-
-                {/* Playlist Songs Display Container */}
-                {filteredSongs.length === 0 ? (
-                  <p className="text-muted italic-text">No Songs Found</p>
-                ) : (
-                  filteredSongs.map((song) => (
-                    <div
-                      key={`${playlist._id}-${song._id || song.trackId}`}
-                      className="border rounded p-2 mb-2 d-flex justify-content-between align-items-center"
-                    >
-                      <div className="d-flex align-items-center gap-3">
-                        {song.artworkUrl && (
-                          <img
-                            src={song.artworkUrl}
-                            alt={song.trackName}
-                            style={{
-                              width: "45px",
-                              height: "45px",
-                              borderRadius: "6px",
-                              objectFit: "cover",
-                            }}
-                          />
-                        )}
-                        <div>
-                          <strong>{song.trackName}</strong>
-                          <br />
-                          <small className="text-muted">
-                            {song.artistName}
-                          </small>
-                        </div>
-                      </div>
-                      <button
-                        className="btn btn-outline-danger btn-sm"
-                        onClick={() =>
-                          removeSong(playlist._id, song._id || song.trackId)
-                        }
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          );
-        })
-      )}
+              );
+            })
+          )}
+        </div>
+      </div>
     </div>
   );
 }

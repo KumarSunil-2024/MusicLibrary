@@ -1,47 +1,32 @@
 const Song = require("../models/Song");
 
-
-
 // Create Song
 exports.createSong = async (req, res) => {
   try {
-    // 1. Pull the fields parsed out by Multer
-    const { songName, singer, albumName, musicDirector, songUrl } = req.body;
+    const { songName, singer, albumName, musicDirector, songUrl, image } = req.body;
 
-    // 2. Validate that none of the required strings arrived blank
-    if (!songName || !singer || !albumName || !musicDirector || !songUrl) {
+    // Validate required text descriptors strictly
+    if (!songName?.trim() || !singer?.trim() || !albumName?.trim() || !musicDirector?.trim() || !songUrl?.trim()) {
       return res.status(400).json({
         success: false,
         message: "All fields (Song Name, Singer, Album, Music Director, Song URL) are strictly required."
       });
     }
 
-    // 3. Assemble a clean dataset matching your Schema fields exactly
-    const songData = {
+    // Save directly with the passed JSON image URL string
+    const song = await Song.create({
       songName,
       singer,
       albumName,
       musicDirector,
       songUrl,
-      artworkUrl100: "" // Default empty if no file is provided
-    };
-
-    // 4. Check if an image file was uploaded
-    if (req.file) {
-      songData.artworkUrl100 = `/uploads/${req.file.filename}`;
-    }
-
-    // 5. Save cleanly to MongoDB
-    const song = await Song.create(songData);
+      image: image || ""
+    });
 
     res.status(201).json(song);
   } catch (error) {
-    // This logs the exact error details into your Node/Express terminal window
     console.error("🚨 MONGOOSE CREATION ERROR:", error.message);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -49,113 +34,81 @@ exports.createSong = async (req, res) => {
 exports.updateSong = async (req, res) => {
   try {
     console.log("===============");
-    console.log("ID:", req.params.id);
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
+    console.log("MUTATION ID:", req.params.id);
+    console.log("PAYLOAD BODY:", req.body);
     console.log("===============");
 
-    return res.json({
-      success: true,
-      body: req.body,
-      file: req.file,
-    });
-  } catch (error) {
-    console.log(error);
+    // 🛠️ BUG FIX: Performs the actual database patch and returns the fresh document data safely
+    const updatedSong = await Song.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { returnDocument: "after", runValidators: true } // Cleans up the old deprecation warning log!
+    );
 
-    res.status(500).json({
-      message: error.message,
-    });
+    if (!updatedSong) {
+      return res.status(404).json({ success: false, message: "Song Not Found" });
+    }
+
+    res.json(updatedSong);
+  } catch (error) {
+    console.error("🚨 MONGOOSE UPDATE ERROR:", error.message);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
 // User Songs (Visible Only)
-
 exports.getSongs = async (req, res) => {
   try {
-    const songs = await Song.find({
-      visibility: true,
-    });
-
+    const songs = await Song.find({ visibility: true }).sort({ createdAt: -1 });
     res.json(songs);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
 // Admin Songs (All)
-
 exports.getAllSongs = async (req, res) => {
   try {
-    const songs = await Song.find();
-
+    const songs = await Song.find().sort({ createdAt: -1 });
     res.json(songs);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
 // Get Single Song
-
 exports.getSongById = async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
-
-    if (!song) {
-      return res.status(404).json({
-        message: "Song Not Found",
-      });
-    }
-
+    if (!song) return res.status(404).json({ message: "Song Not Found" });
     res.json(song);
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
+// Delete Song
 exports.deleteSong = async (req, res) => {
   try {
-    await Song.findByIdAndDelete(req.params.id);
-
-    res.json({
-      message: "Song Deleted",
-    });
+    const song = await Song.findByIdAndDelete(req.params.id);
+    if (!song) return res.status(404).json({ message: "Song Not Found" });
+    res.json({ message: "Song Deleted Successfully" });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
 // Toggle Visibility
-
 exports.toggleVisibility = async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
-
-    if (!song) {
-      return res.status(404).json({
-        message: "Song Not Found",
-      });
-    }
+    if (!song) return res.status(404).json({ message: "Song Not Found" });
 
     song.visibility = !song.visibility;
-
     await song.save();
 
-    res.json({
-      message: "Visibility Updated",
-      visibility: song.visibility,
-      song,
-    });
+    res.json({ message: "Visibility Updated", visibility: song.visibility, song });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };

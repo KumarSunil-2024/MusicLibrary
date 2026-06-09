@@ -6,29 +6,25 @@ const songSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-
     singer: {
       type: String,
       required: true
     },
-
     albumName: {
       type: String,
       required: true
     },
-
     musicDirector: {
       type: String,
       required: true
     },
-
     songUrl: {
       type: String,
       required: true
     },
 
-    // 👇 ADD THIS FIELD RIGHT HERE SO MONGODB CAN STORE THE FILE PATH STRING!
-    artworkUrl100: {
+    // 🔄 FIXED: Renamed to match your JSON payload exactly!
+    image: {
       type: String,
       default: "" 
     },

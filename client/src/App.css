@@ -1,0 +1,12 @@
+/* Smoothly highlights row background on active cursor selection */
+.track-row:hover {
+  background-color: #2d3748 !important;
+  cursor: pointer;
+}
+
+/* Custom dashed boundary frame for clean dashboard layouts */
+.border-dashed {
+  border-style: dashed !important;
+  border-width: 2px !important;
+  border-color: #374151 !important;
+}

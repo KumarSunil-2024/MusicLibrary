@@ -1,116 +1,118 @@
 import { Link } from "react-router-dom";
 
 function Dashboard() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  // Safe fallback if localstorage is missing or corrupted
+  const user = (() => {
+    try { return JSON.parse(localStorage.getItem("user")); } 
+    catch { return null; }
+  })();
+
+  const isAdmin = user?.role === "ADMIN";
+
+  // Reusable card definition to drastically reduce code duplication
+  const navigationCards = [
+    {
+      icon: "🎵",
+      title: "Explore Music",
+      desc: "Browse through the entire library, search your favorite tracks, and play live music previews.",
+      link: "/songs",
+      btnText: "Open Library",
+      colorClass: "btn-primary"
+    },
+    {
+      icon: "🎧",
+      title: "My Playlists",
+      desc: "Curate personal collections, manage soundtracks, and design custom playlists.",
+      link: "/playlists",
+      btnText: "View Playlists",
+      colorClass: "btn-info text-white"
+    },
+    {
+      icon: "👤",
+      title: "Account Profile",
+      desc: "Update security settings, personalize displays, and manage your account credentials.",
+      link: "/profile",
+      btnText: "Manage Profile",
+      colorClass: "btn-success"
+    }
+  ];
 
   return (
-    <div className="container mt-5">
-      {/* Dynamic Welcoming Header Section */}
-      <div className="row mb-4 align-items-center">
-        <div className="col">
-          <span className="text-uppercase tracking-wider text-muted small fw-bold">Overview</span>
-          <h1 className="fw-black display-5 mt-1">Hello, {user?.name || "Music Lover"}! 👋</h1>
+    <div className="container py-4" style={{ color: "#2c3e50" }}>
+      
+      {/* Top Banner Accent Area */}
+      <div className="p-4 mb-4 border shadow-sm d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3" 
+           style={{ backgroundColor: "#f8fafc", borderRadius: "12px" }}>
+        <div>
+          <small className="text-uppercase fw-bold text-muted tracking-wider" style={{ fontSize: "0.75rem" }}>Overview Dashboard</small>
+          <h2 className="fw-bold text-dark m-0 mt-0.5">Hello, {user?.name || "Music Lover"}! 👋</h2>
         </div>
-        <div className="col-auto">
-          <span className={`badge rounded-pill px-3 py-2 fs-6 ${user?.role === "ADMIN" ? "bg-danger text-white" : "bg-dark text-light"}`}>
-            <i className={`bi ${user?.role === "ADMIN" ? "bi-shield-check" : "bi-person"} me-2`}></i>
-            {user?.role || "USER"} Account
+        <div>
+          <span className={`badge border px-3 py-2 fw-semibold ${isAdmin ? "bg-danger-subtle text-danger border-danger-subtle" : "bg-light text-secondary border"}`} style={{ fontSize: "0.85rem" }}>
+            {isAdmin ? "🛡️ Admin Account" : "👤 User Account"}
           </span>
         </div>
       </div>
 
-      {/* Main Navigation Visual Grid */}
-      <div className="row g-4">
-        {/* Card 1: View Songs */}
-        <div className="col-12 col-md-6 col-lg-4">
-          <div className="card h-100 border-0 shadow-sm hover-translate transition p-2">
-            <div className="card-body d-flex flex-column justify-content-between">
-              <div>
-                <div className="icon-square bg-primary-subtle text-primary rounded-3 p-3 d-inline-flex mb-3">
-                  <span className="fs-3">🎵</span>
+      {/* Main Feature Cards Grid */}
+      <div className="row g-3">
+        {navigationCards.map((card, idx) => (
+          <div key={idx} className="col-12 col-md-6 col-lg-4">
+            <div className="card h-100 border shadow-sm bg-white" style={{ borderRadius: "10px", transition: "transform 0.2s" }}>
+              <div className="card-body p-3 d-flex flex-column justify-content-between">
+                <div>
+                  <div className="d-inline-flex align-items-center justify-content-center mb-2" 
+                       style={{ width: "42px", height: "42px", borderRadius: "8px", backgroundColor: "#edf2f7", fontSize: "1.4rem" }}>
+                    {card.icon}
+                  </div>
+                  <h5 className="fw-bold text-dark mb-1">{card.title}</h5>
+                  <p className="text-muted m-0" style={{ fontSize: "0.8rem", lineHeight: "1.4" }}>{card.desc}</p>
                 </div>
-                <h4 className="card-title fw-bold">Explore Music</h4>
-                <p className="card-text text-muted small">Browse through the entire library, search your favorite tracks, and play music previews instantly.</p>
+                <Link to={card.link} className={`btn btn-sm ${card.colorClass} w-100 mt-3 fw-bold py-2`} style={{ borderRadius: "6px" }}>
+                  {card.btnText}
+                </Link>
               </div>
-              <Link to="/songs" className="btn btn-primary w-100 mt-3 fw-semibold">
-                Open Library
-              </Link>
             </div>
           </div>
-        </div>
-
-        {/* Card 2: My Playlists */}
-        <div className="col-12 col-md-6 col-lg-4">
-          <div className="card h-100 border-0 shadow-sm hover-translate transition p-2">
-            <div className="card-body d-flex flex-column justify-content-between">
-              <div>
-                <div className="icon-square bg-info-subtle text-info rounded-3 p-3 d-inline-flex mb-3">
-                  <span className="fs-3">🎧</span>
-                </div>
-                <h4 className="card-title fw-bold">My Playlists</h4>
-                <p className="card-text text-muted small">Manage your personal collection. Curate custom soundscapes, edit tracks, or remove outdated selections.</p>
-              </div>
-              <Link to="/playlists" className="btn btn-info text-white w-100 mt-3 fw-semibold">
-                View Playlists
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3: User Profile */}
-        <div className="col-12 col-md-6 col-lg-4">
-          <div className="card h-100 border-0 shadow-sm hover-translate transition p-2">
-            <div className="card-body d-flex flex-column justify-content-between">
-              <div>
-                <div className="icon-square bg-success-subtle text-success rounded-3 p-3 d-inline-flex mb-3">
-                  <span className="fs-3">👤</span>
-                </div>
-                <h4 className="card-title fw-bold">Account Profile</h4>
-                <p className="card-text text-muted small">Update your security settings, modify profile displays, and manage your account credentials safely.</p>
-              </div>
-              <Link to="/profile" className="btn btn-success w-100 mt-3 fw-semibold">
-                Manage Profile
-              </Link>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Conditionally Rendered Administrative Panel */}
-      {user?.role === "ADMIN" && (
-        <div className="mt-5 pt-4 border-top">
-          <div className="d-flex align-items-center mb-4">
-            <span className="fs-4 me-2">🛠️</span>
-            <h3 className="fw-bold mb-0 text-danger">Administrative Console</h3>
+      {/* Conditional Administrative Control Panel Section */}
+      {isAdmin && (
+        <div className="mt-4 pt-3 border-top">
+          <div className="d-flex align-items-center gap-2 mb-3">
+            <span style={{ fontSize: "1.2rem" }}>🛠️</span>
+            <h5 className="fw-bold m-0 text-danger" style={{ letterSpacing: "-0.3px" }}>Administrative Console</h5>
           </div>
           
-          <div className="row g-4">
+          <div className="row g-3">
             <div className="col-12 col-md-6">
-              <div className="card border-0 bg-dark text-white p-3 shadow-sm">
-                <div className="card-body">
-                  <h5 className="fw-bold text-warning mb-2">Metrics & Controls</h5>
-                  <p className="text-muted small">Review holistic system metrics, monitor active accounts, and manage core system structural adjustments.</p>
-                  <Link to="/admin/dashboard" className="btn btn-outline-warning btn-sm mt-2 px-4">
-                    Launch Admin Board
-                  </Link>
-                </div>
+              <div className="card border-0 p-3 text-white shadow-sm" style={{ backgroundColor: "#1e293b", borderRadius: "10px" }}>
+                <h6 className="fw-bold text-warning mb-1">Metrics & Controls</h6>
+                <p className="text-white-50 m-0 mb-3" style={{ fontSize: "0.78rem", lineHeight: "1.4" }}>
+                  Review holistic system metrics, monitor active client accounts, and adjust structural options.
+                </p>
+                <Link to="/admin/dashboard" className="btn btn-sm btn-outline-warning fw-medium px-4 align-self-start" style={{ borderRadius: "6px" }}>
+                  Launch Dashboard
+                </Link>
               </div>
             </div>
 
             <div className="col-12 col-md-6">
-              <div className="card border-0 bg-dark text-white p-3 shadow-sm">
-                <div className="card-body">
-                  <h5 className="fw-bold text-danger mb-2">Global Library Management</h5>
-                  <p className="text-muted small">Directly upload new media catalogs to the public database, update outdated file paths, or clean up broken songs.</p>
-                  <Link to="/admin/songs" className="btn btn-outline-danger btn-sm mt-2 px-4">
-                    Modify Song Database
-                  </Link>
-                </div>
+              <div className="card border-0 p-3 text-white shadow-sm" style={{ backgroundColor: "#1e293b", borderRadius: "10px" }}>
+                <h6 className="fw-bold text-danger-subtle mb-1">Global Library Management</h6>
+                <p className="text-white-50 m-0 mb-3" style={{ fontSize: "0.78rem", lineHeight: "1.4" }}>
+                  Directly inject fresh catalog items to the public database, update fields, or remove broken songs.
+                </p>
+                <Link to="/admin/songs" className="btn btn-sm btn-outline-danger fw-medium px-4 align-self-start" style={{ borderRadius: "6px" }}>
+                  Modify Database
+                </Link>
               </div>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

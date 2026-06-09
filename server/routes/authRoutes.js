@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const protect = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 
 const {
   register,
@@ -11,8 +11,7 @@ const {
   deleteProfile,
 } = require("../controllers/authController");
 
-// Test
-
+// Test Diagnostic Route
 router.get("/", (req, res) => {
   res.json({
     success: true,
@@ -20,18 +19,13 @@ router.get("/", (req, res) => {
   });
 });
 
-// Auth
-
+// Authentication Access Handlers
 router.post("/register", register);
-
 router.post("/login", login);
 
-// Profile
-
+// User Profile Context
 router.get("/profile", protect, getProfile);
-
 router.put("/profile", protect, updateProfile);
-
 router.delete("/profile", protect, deleteProfile);
 
 module.exports = router;

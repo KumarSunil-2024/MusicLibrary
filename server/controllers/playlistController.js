@@ -9,19 +9,17 @@ exports.createPlaylist = async (req, res) => {
       userId: req.user.id,
     });
     res.status(201).json(playlist);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
 // Get User Playlists
 exports.getPlaylists = async (req, res) => {
   try {
-    // FIXED: Removed .populate("songs") since songs are embedded subdocuments, not collection pointers
-    const playlists = await Playlist.find({ userId: req.user.id });
-    res.json(playlists);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.json(await Playlist.find({ userId: req.user.id }));
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -30,104 +28,112 @@ exports.deletePlaylist = async (req, res) => {
   try {
     await Playlist.findByIdAndDelete(req.params.id);
     res.json({ message: "Playlist Deleted" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
-// Add Song To Playlist
+// Add Song To Playlist (SHORTENED & ATOMIC)
 exports.addSong = async (req, res) => {
   try {
-    const playlist = await Playlist.findById(req.params.id);
-    if (!playlist) return res.status(404).json({ message: "Playlist not found" });
+    const song = await Song.findById(req.body.songId);
+    if (!song) return res.status(404).json({ message: "Song not found" });
 
-    playlist.songs.push(req.body.songId);
-    await playlist.save();
-    res.json(playlist);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    // Fallback if trackId isn't a native number format
+    const trackNum =
+      Number(song.trackId) || Math.floor(100000 + Math.random() * 900000);
+
+    const payload = {
+      trackId: trackNum,
+      trackName: song.songName,
+      artistName: song.singer,
+      albumName: song.albumName,
+      artworkUrl: song.artworkUrl100 || "/default-music.png",
+      previewUrl: song.songUrl,
+      releaseDate: song.createdAt
+        ? song.createdAt.toISOString()
+        : new Date().toISOString(),
+      genre: song.genre || "General",
+    };
+
+    // Atomic push bypasses the old corrupted entries crash issue entirely!
+    const updated = await Playlist.findByIdAndUpdate(
+      req.params.id,
+      { $push: { songs: payload } },
+      { new: true, runValidators: true },
+    );
+
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
-// Remove Song (FIXED LAYER)
+// Remove Song
 exports.removeSong = async (req, res) => {
   try {
-    const { id, songId } = req.params;
-
-    // Directly uses Mongoose atomic array updates via $pull
-    const updatedPlaylist = await Playlist.findByIdAndUpdate(
-      id,
+    const updated = await Playlist.findByIdAndUpdate(
+      req.params.id,
       {
         $pull: {
           songs: {
             $or: [
-              { _id: songId }, // Match against mongoose subdocument system ID
-              { trackId: Number(songId) || 0 } // Safe fallback matching iTunes API ID format
-            ]
-          }
-        }
+              { _id: req.params.songId },
+              { trackId: Number(req.params.songId) || 0 },
+            ],
+          },
+        },
       },
-      { new: true }
+      { new: true },
     );
-
-    if (!updatedPlaylist) {
-      return res.status(404).json({ message: "Playlist not found" });
-    }
-
-    res.json(updatedPlaylist);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
 // Rename Playlist
 exports.updatePlaylist = async (req, res) => {
   try {
-    const playlist = await Playlist.findByIdAndUpdate(
-      req.params.id,
-      { name: req.body.name },
-      { new: true }
+    res.json(
+      await Playlist.findByIdAndUpdate(
+        req.params.id,
+        { name: req.body.name },
+        { new: true },
+      ),
     );
-    res.json(playlist);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
 // Get All Songs
 exports.getAllSongs = async (req, res) => {
   try {
-    const songs = await Song.find();
-    res.json(songs);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.json(await Song.find());
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
 // Add iTunes Song
 exports.addItunesSong = async (req, res) => {
   try {
-    const playlist = await Playlist.findById(req.params.id);
-    if (!playlist) return res.status(404).json({ message: "Playlist not found" });
-
-    playlist.songs.push({
-      trackId: req.body.trackId,
-      trackName: req.body.trackName,
-      artistName: req.body.artistName,
-      albumName: req.body.albumName,
-      artworkUrl: req.body.artworkUrl,
-      previewUrl: req.body.previewUrl,
-      releaseDate: req.body.releaseDate,
-      genre: req.body.genre,
-    });
-
-    await playlist.save();
-    res.json({
-      success: true,
-      message: "Song Added",
-      playlist,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    const updated = await Playlist.findByIdAndUpdate(
+      req.params.id,
+      {
+        $push: {
+          songs: {
+            ...req.body,
+            trackId: Number(req.body.trackId) || 0,
+            releaseDate: String(req.body.releaseDate || ""),
+          },
+        },
+      },
+      { new: true },
+    );
+    res.json({ success: true, playlist: updated });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
