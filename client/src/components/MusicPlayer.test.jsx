@@ -1,16 +1,19 @@
 import { render, screen } from "@testing-library/react";
-import MusicPlayer from "./MusicPlayer";
+import SearchBar from "./SearchBar";
 
-describe("Music Player", () => {
-  test("shows select song message", () => {
+describe("Search Bar", () => {
+  test("renders search input", () => {
     render(
-      <MusicPlayer
-        currentSong={null}
+      <SearchBar
+        search=""
+        setSearch={() => {}}
+        suggestions={[]}
+        selectSong={() => {}}
       />
     );
 
     expect(
-      screen.getByText(/select/i)
+      screen.getByPlaceholderText(/search/i)
     ).toBeInTheDocument();
   });
 });

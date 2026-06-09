@@ -1,8 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const http = require("http"); // 👈 Import native HTTP server module
-const { Server } = require("socket.io"); // 👈 Import Socket.io engine
+const http = require("http"); 
+const { Server } = require("socket.io"); 
 
 const authRoutes = require("./routes/authRoutes");
 const songRoutes = require("./routes/songRoutes");
@@ -18,7 +18,7 @@ const server = http.createServer(app);
 // 2. Initialize Socket.io and assign Cross-Origin Resource settings
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Points safely to your Vite dev environment
+    origin: "http://localhost:5173", 
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
@@ -64,10 +64,5 @@ app.use((req, res) => {
   res.status(404).json({ success: false, message: "Route Not Found" });
 });
 
-// 🎯 FIX: Listen on the HTTP 'server' instance instead of 'app'!
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`🚀 Server listening with real-time sockets on port ${PORT}`);
-});
-
-module.exports = app;
+// 🎯 CRITICAL FIX: Export BOTH entities cleanly as an object wrapper (No inline server.listen here!)
+module.exports = { app, server };

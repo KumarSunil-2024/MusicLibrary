@@ -1,17 +1,20 @@
 import { render, screen } from "@testing-library/react";
+import { describe, test, expect, vi } from "vitest";
 import SearchBar from "./SearchBar";
 
-describe("Search Bar", () => {
+describe("SearchBar", () => {
   test("renders search input", () => {
     render(
       <SearchBar
         search=""
-        setSearch={() => {}}
+        setSearch={vi.fn()}
         suggestions={[]}
-        selectSong={() => {}}
-      />,
+        selectSong={vi.fn()}
+      />
     );
 
-    expect(screen.getByPlaceholderText(/search/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/search/i)
+    ).toBeInTheDocument();
   });
 });

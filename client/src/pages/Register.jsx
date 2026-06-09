@@ -10,84 +10,155 @@ import {
   Button,
   Alert,
   Link,
-  Avatar
+  Avatar,
 } from "@mui/material";
 import { PersonAdd } from "@mui/icons-material";
+import * as yup from "yup";
 import api from "../services/api";
+
+const registerSchema = yup.object({
+  name: yup.string().required("Name is required"),
+
+  emailId: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+
+  phone: yup
+    .string()
+    .matches(/^[0-9]{10}$/, "Phone number must be exactly 10 digits")
+    .required("Phone number is required"),
+
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
 
 function Register() {
   const navigate = useNavigate();
-  const [user, setUser] = useState({ name: "", email: "", phone: "", password: "" });
+
+  const [user, setUser] = useState({
+    name: "",
+    emailId: "",
+    phone: "",
+    password: "",
+  });
+
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  setError("");
+    setError("");
+    setErrors({});
 
-  if (!user.name.trim()) {
-    setError("Name is required");
-    return;
-  }
+    try {
+      await registerSchema.validate(user, {
+        abortEarly: false,
+      });
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      await api.post("/auth/register", user);
 
-  if (!emailRegex.test(user.email)) {
-    setError("Invalid email format");
-    return;
-  }
+      alert("Registration Successful!");
+      navigate("/");
+    } catch (error) {
+      if (error.name === "ValidationError") {
+        const validationErrors = {};
 
-  if (!/^[0-9]{10}$/.test(user.phone)) {
-    setError("Phone number must be 10 digits");
-    return;
-  }
+        error.inner.forEach((err) => {
+          validationErrors[err.path] = err.message;
+        });
 
-  if (user.password.length < 6) {
-    setError(
-      "Password must be at least 6 characters"
-    );
-    return;
-  }
+        setErrors(validationErrors);
+      } else {
+        setError(
+          error.response?.data?.message ||
+            "Registration Failed"
+        );
+      }
+    }
+  };
 
-  try {
-    await api.post("/auth/register", user);
-
-    alert("Registration Successful");
-
-    navigate("/");
-  } catch (error) {
-    setError(
-      error.response?.data?.message ||
-      "Registration Failed"
-    );
-  }
-};
   return (
     <Container maxWidth="xs">
-      <Box sx={{ mt: 3, mb: 3, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Card elevation={2} sx={{ borderRadius: 2, width: "100%", p: 1 }}>
-          <CardContent sx={{ '&:last-child': { pb: 1 } }}>
-            {/* Minimal Header */}
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mb: 1.5 }}>
-              <Avatar sx={{ m: 0.5, bgcolor: "success.main", width: 40, height: 40 }}>
+      <Box
+        sx={{
+          mt: 3,
+          mb: 3,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Card
+          elevation={2}
+          sx={{
+            borderRadius: 2,
+            width: "100%",
+            p: 1,
+          }}
+        >
+          <CardContent
+            sx={{
+              "&:last-child": {
+                pb: 1,
+              },
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                mb: 1.5,
+              }}
+            >
+              <Avatar
+                sx={{
+                  m: 0.5,
+                  bgcolor: "success.main",
+                  width: 40,
+                  height: 40,
+                }}
+              >
                 <PersonAdd fontSize="small" />
               </Avatar>
-              <Typography component="h1" variant="h6" fontWeight="bold">
+
+              <Typography
+                component="h1"
+                variant="h6"
+                fontWeight="bold"
+              >
                 Create Account
               </Typography>
             </Box>
 
             {error && (
-              <Alert severity="error" size="small" sx={{ mb: 1.5, py: 0, borderRadius: 1.5 }}>
+              <Alert
+                severity="error"
+                sx={{
+                  mb: 1.5,
+                  borderRadius: 1.5,
+                }}
+              >
                 {error}
               </Alert>
             )}
 
-            <Box component="form" onSubmit={handleSubmit} noValidate>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              noValidate
+            >
               <TextField
                 margin="dense"
                 size="small"
@@ -98,18 +169,24 @@ function Register() {
                 autoFocus
                 value={user.name}
                 onChange={handleChange}
+                error={!!errors.name}
+                helperText={errors.name}
               />
+
               <TextField
                 margin="dense"
                 size="small"
                 required
                 fullWidth
                 label="Email Address"
-                name="email"
+                name="emailId"
                 type="email"
-                value={user.email}
+                value={user.emailId}
                 onChange={handleChange}
+                error={!!errors.emailId}
+                helperText={errors.emailId}
               />
+
               <TextField
                 margin="dense"
                 size="small"
@@ -119,7 +196,10 @@ function Register() {
                 name="phone"
                 value={user.phone}
                 onChange={handleChange}
+                error={!!errors.phone}
+                helperText={errors.phone}
               />
+
               <TextField
                 margin="dense"
                 size="small"
@@ -130,6 +210,8 @@ function Register() {
                 type="password"
                 value={user.password}
                 onChange={handleChange}
+                error={!!errors.password}
+                helperText={errors.password}
                 sx={{ mb: 2 }}
               />
 
@@ -139,14 +221,30 @@ function Register() {
                 variant="contained"
                 color="success"
                 size="medium"
-                sx={{ py: 1, borderRadius: 1.5, textTransform: "none", fontWeight: "bold" }}
+                sx={{
+                  py: 1,
+                  borderRadius: 1.5,
+                  textTransform: "none",
+                  fontWeight: "bold",
+                }}
               >
                 Sign Up
               </Button>
             </Box>
 
-            <Box sx={{ mt: 1.5, display: "flex", justifyContent: "center" }}>
-              <Link component={RouterLink} to="/" variant="body2" underline="hover">
+            <Box
+              sx={{
+                mt: 1.5,
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <Link
+                component={RouterLink}
+                to="/"
+                variant="body2"
+                underline="hover"
+              >
                 Already have an account? Sign In
               </Link>
             </Box>
