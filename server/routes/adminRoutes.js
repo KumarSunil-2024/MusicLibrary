@@ -1,24 +1,34 @@
 const express = require("express");
 const router = express.Router();
 
+// Import authentication and authorization middleware layers
 const { protect, admin } = require("../middleware/authMiddleware");
 
-// 🎯 FIXED: Direct safe import of the entire controller object to avoid destructured undefined crashes
+// Import the complete admin controller module object
 const adminController = require("../controllers/adminController");
 
-// ==========================================
-// 👥 USER MANAGEMENT CHANNELS
-// ==========================================
+/* ==========================================================================
+   1. ADMINISTRATIVE USER ACCOUNT REGISTRY MANAGEMENT
+   ========================================================================== */
 
-// If a function doesn't exist yet, we use a fallback anonymous function to prevent server crashes
-router.get("/users", protect, admin, adminController.getUsers || ((req, res) => res.json([])));
-router.get("/users/:id", protect, admin, adminController.getUser || ((req, res) => res.json({})));
-router.put("/users/:id", protect, admin, adminController.updateUser || ((req, res) => res.json({})));
-router.delete("/users/:id", protect, admin, adminController.deleteUser || ((req, res) => res.json({})));
+// GET /api/admin/users -> Fetch full list of profiles (Excludes passwords)
+router.get("/users", protect, admin, adminController.getUsers);
 
-// ==========================================
-// 🎵 SONG & NOTIFICATION DIRECT GATEWAYS
-// ==========================================
+// GET /api/admin/users/:id -> Read a specific profile entity details
+router.get("/users/:id", protect, admin, adminController.getUser);
+
+// PUT /api/admin/users/:id -> Modify an account profile node properties
+router.put("/users/:id", protect, admin, adminController.updateUser);
+
+// DELETE /api/admin/users/:id -> Purge an account permanently from the registry
+router.delete("/users/:id", protect, admin, adminController.deleteUser);
+
+
+/* ==========================================================================
+   2. SYSTEM CATALOG & BROADCAST OPERATIONS
+   ========================================================================== */
+
+// POST /api/admin/songs -> Inject a brand new song and broadcast real-time socket alerts
 router.post("/songs", protect, admin, adminController.adminAddSong);
 
 module.exports = router;

@@ -12,21 +12,33 @@ import {
   Button,
   Chip,
 } from "@mui/material";
-
 import { Person } from "@mui/icons-material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Profile() {
   const navigate = useNavigate();
+  const [storedUser, setStoredUser] = useState(null);
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
 
-  const storedUser = JSON.parse(localStorage.getItem("user"));
+  // 1. SAFE STORAGE READ (Runs once on mount to prevent rendering mismatches)
+  useEffect(() => {
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      try {
+        const parsedUser = JSON.parse(userString);
+        setStoredUser(parsedUser);
+        setName(parsedUser?.name || "");
+        setPhone(parsedUser?.phone || "");
+      } catch (err) {
+        console.error("Failed to parse user session:", err);
+      }
+    }
+  }, []);
 
-  const [name, setName] = useState(storedUser?.name || "");
-
-  const [phone, setPhone] = useState(storedUser?.phone || "");
-
+  // 2. EXPLICIT UPDATE LOGIC WITH VALIDATION
   const updateProfile = async () => {
     if (!name.trim()) {
       alert("Name is required");
@@ -39,105 +51,114 @@ function Profile() {
     }
 
     try {
-      const res = await api.put("/auth/profile", {
-        name,
-        phone,
-      });
+      const res = await api.put("/auth/profile", { name, phone });
+      const updatedData = res.data.user || res.data;
 
-      localStorage.setItem("user", JSON.stringify(res.data.user || res.data));
-
+      localStorage.setItem("user", JSON.stringify(updatedData));
+      setStoredUser(updatedData);
       alert("Profile Updated");
     } catch (error) {
-      console.log(error);
+      console.error("Profile update failed:", error);
     }
   };
 
+  // 3. ACCOUNT DELETION & STORAGE FLUSH
   const deleteUser = async () => {
-    const confirmDelete = window.confirm("Delete Account?");
-
-    if (!confirmDelete) return;
+    if (!window.confirm("Delete Account?")) return;
 
     try {
       await api.delete("/auth/profile");
-
-      localStorage.removeItem("user");
-
-      localStorage.removeItem("token");
-
+      localStorage.clear(); // Clear all tokens immediately
       navigate("/");
     } catch (error) {
-      console.log(error);
+      console.error("Account deletion failed:", error);
     }
   };
 
   return (
     <Container maxWidth="sm">
-      <Box sx={{ mt: 3 }}>
-        <Card>
+      <Box sx={{ mt: 3, px: { xs: 1, sm: 0 } }}>
+        <Card sx={{ borderRadius: "12px", boxShadow: 3 }}>
           <CardContent>
-            <Box
-              sx={{
-                textAlign: "center",
-                mb: 2,
-              }}
-            >
+            {/* AVATAR & TITLE HEADER */}
+            <Box sx={{ textAlign: "center", mb: 2 }}>
               <Avatar
                 sx={{
                   bgcolor: "primary.main",
                   mx: "auto",
+                  width: 48,
+                  height: 48,
                 }}
               >
                 <Person />
               </Avatar>
-
-              <Typography variant="h5" mt={1}>
+              <Typography variant="h5" mt={1} fontWeight="bold">
                 User Profile
               </Typography>
             </Box>
 
             <Divider />
 
-            <List>
-              <ListItem>
+            {/* INPUT FIELDS LIST */}
+            <List disablePadding sx={{ my: 1 }}>
+              <ListItem disableGutters sx={{ py: 1 }}>
                 <TextField
                   fullWidth
                   label="Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  variant="outlined"
+                  size="small"
                 />
               </ListItem>
 
-              <ListItem>
+              <ListItem disableGutters sx={{ py: 1 }}>
                 <TextField
                   fullWidth
                   label="Email"
-                  value={storedUser?.email}
+                  value={storedUser?.email || ""}
                   disabled
+                  variant="outlined"
+                  size="small"
                 />
               </ListItem>
 
-              <ListItem>
+              <ListItem disableGutters sx={{ py: 1 }}>
                 <TextField
                   fullWidth
                   label="Phone"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  variant="outlined"
+                  size="small"
                 />
               </ListItem>
 
-              <ListItem>
-                <Chip label={storedUser?.role} color="primary" />
+              <ListItem disableGutters sx={{ py: 1 }}>
+                <Chip
+                  label={storedUser?.role || "USER"}
+                  color="primary"
+                  variant="combined"
+                  fontWeight="bold"
+                />
               </ListItem>
             </List>
 
+            {/* ACTION BUTTON CONTAINER - Fully Responsive Layout Shift */}
             <Box
               sx={{
                 display: "flex",
+                flexDirection: { xs: "column", sm: "row" }, // Stacks on phone, row on tablet/desktop
                 gap: 2,
                 mt: 2,
               }}
             >
-              <Button variant="contained" fullWidth onClick={updateProfile}>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={updateProfile}
+                sx={{ py: 1, fontWeight: "bold" }}
+              >
                 Update Profile
               </Button>
 
@@ -146,6 +167,7 @@ function Profile() {
                 color="error"
                 fullWidth
                 onClick={deleteUser}
+                sx={{ py: 1, fontWeight: "bold" }}
               >
                 Delete User
               </Button>

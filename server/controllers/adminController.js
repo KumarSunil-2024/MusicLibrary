@@ -1,66 +1,72 @@
 const Song = require("../models/Song");
-const Notification = require("../models/Notification");
+const adminService = require("../services/adminService");
 const userService = require("../services/userService");
 
+// Unified Async Error Handler Wrapper
 const asyncHandler = (fn) => (req, res, next) => {
   fn(req, res, next).catch((err) => {
-    console.error("🚨 DATABASE EXECUTION ERROR:", err.message);
+    console.error("🚨 Controller execution failure:", err.message);
     res.status(500).json({ success: false, message: err.message });
   });
 };
 
-// ==========================================
-// 🎵 CORE SONG & NOTIFICATION WRITER (THE FIX)
-// ==========================================
+/* ==========================================================================
+   1. CATALOG & LIVE BROADCAST OPERATIONS
+   ========================================================================== */
+
+// POST /api/admin/songs -> Adds a song and fires a live socket alert
 exports.adminAddSong = asyncHandler(async (req, res) => {
-  console.log("📥 [1/3] Received song payload from frontend:", req.body);
+  console.log("📥 Processing song upload payload:", req.body);
   
-  const { songName, songTitle, singer, albumName, albumTitle, musicDirector, songUrl, image } = req.body;
-  const targetTitle = (songName || songTitle || "New Track").trim();
+  const adminId = req.user?.id || null;
 
-  // 1. Force Write directly to the Songs collection
-  const song = await Song.create({
-    songName: targetTitle,
-    songTitle: targetTitle,
-    singer: (singer || "Unknown Artist").trim(),
-    albumName: (albumName || albumTitle || "Single").trim(),
-    albumTitle: (albumName || albumTitle || "Single").trim(),
-    musicDirector: (musicDirector || "Unknown").trim(),
-    songUrl: (songUrl || "").trim(),
-    image: image || "",
-    visibility: true
+  // Delegate business logic completely to the AdminService layer
+  const song = await adminService.addSongAndNotify(req.body, adminId);
+
+  res.status(201).json({ 
+    success: true, 
+    message: "Song cataloged and broadcast successfully",
+    song 
   });
-  console.log("💾 [2/3] Song saved successfully. ID:", song._id);
-
-  // 2. Force Write directly to the Notifications collection matching your exact schema
-  const newNotification = await Notification.create({
-    title: "New Song Added",
-    message: `🎵 New Release: "${targetTitle}" by ${song.singer} is now available!`,
-    songId: song._id,
-    createdBy: req.user?.id || null
-  });
-  console.log("📢 [3/3] Notification FORCE WRITTEN to MongoDB. ID:", newNotification._id);
-
-  // 3. Broadcast across real-time WebSockets
-  if (global.io) {
-    global.io.emit("new_song_notification", {
-      _id: newNotification._id,
-      title: newNotification.title,
-      message: newNotification.message,
-      createdAt: newNotification.createdAt
-    });
-    console.log("⚡ Live WebSocket broadcast emitted.");
-  }
-
-  res.status(201).json({ success: true, song, notification: newNotification });
 });
 
-// ==========================================
-// 👤 USER MANAGEMENT BACKUPS
-// ==========================================
-exports.getUsers = asyncHandler(async (req, res) => res.json(await userService.getAllUsersMaster()));
-exports.getUser = asyncHandler(async (req, res) => res.json(await userService.getUserDetailsById(req.params.id)));
-exports.updateUser = asyncHandler(async (req, res) => res.json(await userService.adminModifyUser(req.params.id, req.body)));
-exports.deleteUser = asyncHandler(async (req, res) => { await userService.removeUserRecord(req.params.id); res.json({ success: true }); });
-exports.adminUpdateSong = asyncHandler(async (req, res) => res.json(await Song.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })));
-exports.adminDeleteSong = asyncHandler(async (req, res) => { await Song.findByIdAndDelete(req.params.id); res.json({ success: true }); });
+// PUT /api/admin/songs/:id -> Modifies song metadata fields
+exports.adminUpdateSong = asyncHandler(async (req, res) => {
+  const updatedSong = await adminService.updateLibrarySong(req.params.id, req.body);
+  res.json({ success: true, song: updatedSong });
+});
+
+// DELETE /api/admin/songs/:id -> Drops a song permanently from the database
+exports.adminDeleteSong = asyncHandler(async (req, res) => {
+  await adminService.deleteLibrarySong(req.params.id);
+  res.json({ success: true, message: "Song removed from database" });
+});
+
+
+/* ==========================================================================
+   2. SYSTEM USER ACCOUNT MANAGEMENT (Delegates to UserService)
+   ========================================================================== */
+
+// GET /api/admin/users -> Fetch full list of profiles (Excludes passwords)
+exports.getUsers = asyncHandler(async (req, res) => {
+  const users = await userService.getAllUsersMaster();
+  res.json(users);
+});
+
+// GET /api/admin/users/:id -> Read a specific profile entity
+exports.getUser = asyncHandler(async (req, res) => {
+  const user = await userService.getUserDetailsById(req.params.id);
+  res.json(user);
+});
+
+// PUT /api/admin/users/:id -> Modify an account profile node
+exports.updateUser = asyncHandler(async (req, res) => {
+  const updatedUser = await userService.adminModifyUser(req.params.id, req.body);
+  res.json(updatedUser);
+});
+
+// DELETE /api/admin/users/:id -> Purge an account permanently
+exports.deleteUser = asyncHandler(async (req, res) => {
+  await userService.removeUserRecord(req.params.id);
+  res.json({ success: true, message: "User profile purged successfully" });
+});

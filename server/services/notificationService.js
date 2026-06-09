@@ -1,12 +1,18 @@
 const Notification = require("../models/Notification");
 
 class NotificationService {
+  // 1. BROADCAST ALERT: Saves notification record and fires WebSocket stream event
   async createSongNotification(song, adminId) {
+    // Basic data guard layer
+    if (!song?._id || !song?.songName) {
+      throw new Error("Missing mandatory song metadata parameters for alert payload");
+    }
+
     try {
       const titleText = "New Song Added";
-      const messageText = `🎵 New Release: "${song.songName}" by ${song.singer} is now available!`;
+      const messageText = `🎵 New Release: "${song.songName}" by ${song.singer || "Unknown Artist"} is now available!`;
       
-      // 🎯 FORCE VALIDATION ALIGNMENT: Explicitly saves fields to match your schema file exactly
+      // Explicitly map inputs to ensure strict schema compliance
       const newNotification = await Notification.create({
         title: titleText,
         message: messageText,
@@ -14,28 +20,35 @@ class NotificationService {
         createdBy: adminId || null
       });
 
-      console.log("💾 DATABASE VERIFICATION: Notification written to MongoDB Compass! ID:", newNotification._id);
+      console.log("💾 Notification persisted in database with ID:", newNotification._id);
 
-      // Live WebSockets Transmission Trigger
+      // 2. LIVE EMIT PIPELINE (Protected from external stream failures)
       if (global.io) {
-        global.io.emit("new_song_notification", {
-          _id: newNotification._id,
-          title: newNotification.title,
-          message: newNotification.message,
-          createdAt: newNotification.createdAt
-        });
-        console.log("⚡ SOCKETS VERIFICATION: Broadcast pushed out across network stream successfully.");
+        try {
+          global.io.emit("new_song_notification", {
+            _id: newNotification._id,
+            title: newNotification.title,
+            message: newNotification.message,
+            createdAt: newNotification.createdAt
+          });
+          console.log("⚡ Real-time WebSocket broadcast transmitted successfully.");
+        } catch (socketError) {
+          console.error("⚠️ Sockets Broadcast dropped out, database entry remains intact:", socketError.message);
+        }
       }
 
       return newNotification;
     } catch (error) {
-      console.error("🚨 CRITICAL ERROR WRITING NOTIFICATION TO DATABASE:", error.message);
+      console.error("🚨 Critical database notification write failure:", error.message);
+      throw error; // Re-throw error so parenting services are contextually aware
     }
   }
 
+  // 3. FETCH RECENT LOG INDEX: Pulls last 20 public notifications
   async getAllNotifications() {
     return await Notification.find().sort({ createdAt: -1 }).limit(20);
   }
 }
 
+// Export a single initialized instance of the service class
 module.exports = new NotificationService();

@@ -1,12 +1,56 @@
-/* Smoothly highlights row background on active cursor selection */
-.track-row:hover {
-  background-color: #2d3748 !important;
-  cursor: pointer;
+/* ==========================================================================
+   1. UNIVERSAL RESET (Resets margins and fixes element sizing)
+   ========================================================================== */
+*, 
+*::before, 
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-/* Custom dashed boundary frame for clean dashboard layouts */
+/* ==========================================================================
+   2. GLOBAL BODY & MEDIA DEFAULTS
+   ========================================================================== */
+html {
+  font-size: 100%; /* Default browser scale (usually 16px) */
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f8fafc; /* Clean background default */
+}
+
+/* Prevents large media images from overflowing their parent cards */
+img, 
+picture, 
+video, 
+canvas, 
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ==========================================================================
+   3. RESPONSIVE LAYOUT UTILITIES (No more heavy !important overrides)
+   ========================================================================== */
+
+/* Smoothly highlights a track row background on hover */
+.track-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.track-row:hover {
+  background-color: #2d3748;
+}
+
+/* Custom dashed boundary empty state frame for playlists/cards */
 .border-dashed {
-  border-style: dashed !important;
-  border-width: 2px !important;
-  border-color: #374151 !important;
+  border: 2px dashed #374151;
 }
