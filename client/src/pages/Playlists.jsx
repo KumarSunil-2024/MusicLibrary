@@ -9,8 +9,35 @@ function Playlists() {
   const fetchPlaylists = async () => {
     try {
       const res = await api.get("/playlists");
-      setPlaylists(res.data);
-    } catch (err) { console.error("Error fetching playlists:", err); }
+      
+      // 🛠️ ROOT CAUSE CORRECTION: Normalize song sub-arrays right when they arrive from the API
+      const sanitizedPlaylists = res.data.map(playlist => ({
+        ...playlist,
+        songs: (playlist.songs || []).map(s => {
+          if (!s) return null;
+          
+          // Force identify any potential image string variables
+          let finalImage = s.image || s.artworkUrl100 || s.artworkUrl || "";
+          
+          // Wipes out broken local relative paths or blank strings cleanly
+          if (!finalImage || typeof finalImage !== "string" || !finalImage.startsWith("http")) {
+            finalImage = "/default-music.png";
+          }
+
+          return {
+            ...s,
+            trackId: s._id || s.trackId,
+            trackName: s.songName || s.songTitle || s.trackName || "Untitled Track",
+            artistName: s.singer || s.artistName || "Unknown Artist",
+            artworkUrl: finalImage // Uniformly locks down this key shape for the renderer
+          };
+        }).filter(Boolean) // Clears ghost null values if a song was deleted from the system database
+      }));
+
+      setPlaylists(sanitizedPlaylists);
+    } catch (err) { 
+      console.error("Error fetching and sanitizing playlists:", err); 
+    }
   };
 
   useEffect(() => { fetchPlaylists(); }, []);
@@ -41,6 +68,8 @@ function Playlists() {
 
   return (
     <div className="container py-3" style={{ color: "#2c3e50" }}>
+      
+      {/* Title Workspace Hub */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
         <div>
           <h2 className="fw-bold m-0" style={{ letterSpacing: "-0.5px", color: "#1e3a8a" }}>🎧 My Playlists</h2>
@@ -52,6 +81,7 @@ function Playlists() {
       </div>
 
       <div className="row g-3">
+        {/* Left Side: Creator Controls Panel */}
         <div className="col-md-4">
           <div className="card p-3 shadow-sm border" style={{ backgroundColor: "#f8fafc", borderRadius: "10px" }}>
             <h6 className="fw-bold mb-2" style={{ color: "#1e3a8a" }}>New Collection</h6>
@@ -62,6 +92,7 @@ function Playlists() {
           </div>
         </div>
 
+        {/* Right Side: Active Playlists Grid */}
         <div className="col-md-8">
           {playlists.length === 0 ? (
             <div className="text-center py-4 rounded border border-secondary border-dashed" style={{ backgroundColor: "#f8fafc" }}>
@@ -69,15 +100,19 @@ function Playlists() {
             </div>
           ) : (
             playlists.map((p) => {
-              const query = search.toLowerCase();
-              const filteredSongs = (p.songs || []).filter(s => s?.trackName?.toLowerCase().includes(query));
+              const query = search.toLowerCase().trim();
+              
+              const filteredSongs = p.songs.filter(s => 
+                s.trackName.toLowerCase().includes(query) ||
+                s.artistName.toLowerCase().includes(query)
+              );
 
               return (
                 <div key={p._id} className="card border mb-3 shadow-sm" style={{ borderRadius: "10px", overflow: "hidden" }}>
                   <div className="px-3 py-2 d-flex justify-content-between align-items-center border-bottom" style={{ backgroundColor: "#edf2f7" }}>
                     <div>
                       <h5 className="fw-bold m-0 d-inline-block text-dark me-2">{p.name}</h5>
-                      <span className="badge bg-secondary rounded-pill" style={{ fontSize: "0.75rem" }}>{p.songs?.filter(Boolean).length || 0} items</span>
+                      <span className="badge bg-secondary rounded-pill" style={{ fontSize: "0.75rem" }}>{p.songs.length} items</span>
                     </div>
                     <div className="d-flex gap-1">
                       <button className="btn btn-sm px-2 py-0.5 btn-outline-primary" style={{ fontSize: "0.8rem" }} onClick={() => renamePlaylist(p._id)}>Rename</button>
@@ -90,10 +125,18 @@ function Playlists() {
                       <p className="text-muted m-0 py-2 text-center" style={{ fontSize: "0.85rem" }}>No matching songs found</p>
                     ) : (
                       filteredSongs.map((song, idx) => (
-                        <div key={`${p._id}-${song._id || song.trackId}`} className="d-flex justify-content-between align-items-center p-1 rounded mb-1 border-bottom">
+                        <div key={`${p._id}-${song.trackId || idx}`} className="d-flex justify-content-between align-items-center p-1 rounded mb-1 border-bottom">
                           <div className="d-flex align-items-center gap-2">
                             <small className="text-muted fw-bold ps-1" style={{ width: "15px" }}>{idx + 1}</small>
-                            <img src={song.artworkUrl || "/default-music.png"} alt="" style={{ width: "32px", height: "32px", borderRadius: "4px", objectFit: "cover" }} onError={(e) => { e.target.src = "/default-music.png"; }} />
+                            
+                            {/* 🎯 RENDERS GUARANTEED SANITIZED ASSETS EVERY TIME */}
+                            <img 
+                              src={song.artworkUrl} 
+                              alt="" 
+                              style={{ width: "32px", height: "32px", borderRadius: "4px", objectFit: "cover" }} 
+                              onError={(e) => { e.target.src = "/default-music.png"; }} 
+                            />
+                            
                             <div>
                               <p className="mb-0 fw-bold text-dark" style={{ fontSize: "0.9rem", lineHeight: "1.2" }}>{song.trackName}</p>
                               <small className="text-muted d-block" style={{ fontSize: "0.75rem" }}>{song.artistName}</small>
