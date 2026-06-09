@@ -11,7 +11,7 @@ function Songs() {
   const [playlists, setPlaylists] = useState([]);
   const [playlistId, setPlaylistId] = useState("");
 
-  // Clean data fetch bundled in a single initial effect block
+  // Fetches core collections concurrently on view initialization
   useEffect(() => {
     (async () => {
       try {
@@ -22,40 +22,39 @@ function Songs() {
         
         setSongs(songsRes.data.map(s => ({
           trackId: s._id,
-          trackName: s.songName || "Unknown Track",
-          artistName: s.singer || "Unknown Artist",
-          collectionName: s.albumName || "Unknown Album",
           
-          // 💻 FIX 1: Explicitly tracks your backend's schema string keys
-          artworkUrl100: s.image || s.artworkUrl100 || "/default-music.png",
+          // 🛠️ ROOT CAUSE SOLUTION: Fallbacks bridge 'songName' and 'songTitle' mismatch seamlessly
+          trackName: s.songName || s.songTitle || "Unknown Track",
+          artistName: s.singer || "Unknown Artist",
+          collectionName: s.albumName || s.albumTitle || "Unknown Album",
+          
+          // Dynamic text string checking maps artwork images reliably 
+          artworkUrl100: s.image || "/default-music.png",
           
           previewUrl: s.songUrl,
-          releaseDate: s.createdAt,
-          musicDirector: s.musicDirector,
-          isAdminSong: true
+          musicDirector: s.musicDirector
         })));
         setPlaylists(playlistsRes.data);
-      } catch (err) { console.error("Fetch failed:", err); }
+      } catch (err) { console.error("Library boot failure:", err); }
     })();
   }, []);
 
-  // Performance Memoization auto-filters tracks on the fly
+  // Performance Memoization tracks filtering parameters cleanly in application memory
   const filteredSongs = useMemo(() => {
     const term = search.toLowerCase().trim();
     if (!term) return songs;
     return songs.filter(s => 
-      s.trackName?.toLowerCase().includes(term) ||
-      s.artistName?.toLowerCase().includes(term) ||
-      s.collectionName?.toLowerCase().includes(term)
+      s.trackName?.toLowerCase().includes(term) || 
+      s.artistName?.toLowerCase().includes(term)
     );
   }, [search, songs]);
 
-  // Memoized selection handler prevents child items from re-rendering unproductively
+  // Performance Optimization: Cache element trigger handlers to prevent parent loop redraws
   const selectSong = useCallback((song) => {
     setCurrentSong(song);
   }, []);
 
-  // ⚡ FIX 2: Dynamic Index Tracking syncs player skip commands to the active filtered list
+  // Fixed Context Index Shuffling: Keeps player queue boundaries mapped to your sidebar filtering state
   const shiftTrack = useCallback((step) => {
     if (!currentSong || !filteredSongs.length) return;
     
@@ -67,19 +66,11 @@ function Songs() {
     }
   }, [currentSong, filteredSongs]);
 
-  const addToPlaylist = async () => {
-    if (!currentSong || !playlistId) return alert("Select Song and Playlist Target First");
-    try {
-      await api.put(`/playlists/${playlistId}/add-song`, { songId: currentSong.trackId });
-      alert("Song Added To Playlist Successfully!");
-    } catch (err) { alert(`Error: ${err.response?.data?.message || "Failed"}`); }
-  };
-
   return (
     <div className="container py-3" style={{ color: "#2c3e50" }}>
       <div className="row g-3">
         
-        {/* Left Side: Discovery Sidebar */}
+        {/* Left Side: Dynamic Sidebar Music Discovery Grid */}
         <div className="col-md-4">
           <div className="card shadow-sm border" style={{ backgroundColor: "#f8fafc", borderRadius: "10px" }}>
             <div className="p-2 border-bottom" style={{ backgroundColor: "#edf2f7" }}>
@@ -91,9 +82,8 @@ function Songs() {
           </div>
         </div>
 
-        {/* Right Side: Operations Deck */}
+        {/* Right Side: Interactive Search Hub & Focused Control Deck */}
         <div className="col-md-8 d-flex flex-column gap-3">
-          
           <SearchBar 
             search={search} 
             setSearch={setSearch} 
@@ -107,7 +97,7 @@ function Songs() {
               <div className="card-body p-3 bg-white">
                 <div className="d-flex flex-column flex-sm-row align-items-center gap-3">
                   
-                  {/* Square Album Graphic */}
+                  {/* Aspect Ratio Square Graphics Frame */}
                   <img 
                     src={currentSong.artworkUrl100} 
                     alt="" 
@@ -115,7 +105,7 @@ function Songs() {
                     style={{ width: "90px", height: "90px", borderRadius: "8px", objectFit: "cover" }} 
                   />
                   
-                  {/* Details Data Stack */}
+                  {/* Track Meta Information Readouts */}
                   <div className="flex-grow-1 text-center text-sm-start w-100">
                     <h5 className="fw-bold mb-1 text-dark">
                       {currentSong.trackName}{" "}
@@ -125,15 +115,18 @@ function Songs() {
                     <p className="m-0 text-muted" style={{ fontSize: "0.85rem" }}>
                       <strong>Artist:</strong> {currentSong.artistName} &nbsp;|&nbsp; <strong>Album:</strong> {currentSong.collectionName}
                     </p>
-                    {currentSong.musicDirector && <small className="text-secondary d-block mt-0.5">Director: {currentSong.musicDirector}</small>}
 
-                    {/* Playlist Association Controls Layout */}
+                    {/* Curated Playlist Integration Sub-Section Controls */}
                     <div className="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 mt-2 pt-2 border-top">
-                      <select className="form-select form-select-sm border shadow-sm w-auto" style={{ fontSize: "0.8rem", minWidth: "180px" }} value={playlistId} onChange={e => setPlaylistId(e.target.value)}>
+                      <select className="form-select form-select-sm w-auto" style={{ fontSize: "0.8rem", minWidth: "180px" }} value={playlistId} onChange={e => setPlaylistId(e.target.value)}>
                         <option value="">➕ Select Playlist Target</option>
                         {playlists.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
                       </select>
-                      <button className="btn btn-sm btn-success fw-bold px-3" onClick={addToPlaylist}>Add</button>
+                      <button className="btn btn-sm btn-success fw-bold px-3" onClick={async () => {
+                        if (!playlistId) return alert("Select a target playlist destination!");
+                        await api.put(`/playlists/${playlistId}/add-song`, { songId: currentSong.trackId });
+                        alert("Song Added To Playlist Successfully!");
+                      }}>Add</button>
                     </div>
                   </div>
 
@@ -143,11 +136,11 @@ function Songs() {
           ) : (
             <div className="card text-center border p-4 shadow-sm bg-white" style={{ borderRadius: "10px" }}>
               <span>✨</span><h6 className="fw-bold mt-2 text-dark m-0">No Song Selected</h6>
-              <small className="text-muted">Choose a track from the list to get started.</small>
+              <small className="text-muted">Choose a track from the sidebar listing to initialize audio streaming parameters.</small>
             </div>
           )}
 
-          {/* Bottom Custom Media Interface Bar */}
+          {/* Integrated Media Player Layout Attachment */}
           <MusicPlayer currentSong={currentSong} nextSong={() => shiftTrack(1)} previousSong={() => shiftTrack(-1)} />
         </div>
 

@@ -2,18 +2,33 @@ const mongoose = require("mongoose");
 
 const songSchema = new mongoose.Schema(
   {
+    // Base field (made flexible so older entries don't fail validation)
     songName: {
       type: String,
-      required: true
+      default: ""
     },
+    // Legacy database key fallback support
+    songTitle: {
+      type: String,
+      default: ""
+    },
+
     singer: {
       type: String,
       required: true
     },
+
+    // Base field 
     albumName: {
       type: String,
-      required: true
+      default: ""
     },
+    // Legacy database key fallback support
+    albumTitle: {
+      type: String,
+      default: ""
+    },
+
     musicDirector: {
       type: String,
       required: true
@@ -22,13 +37,10 @@ const songSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-
-    // 🔄 FIXED: Renamed to match your JSON payload exactly!
     image: {
       type: String,
       default: "" 
     },
-
     visibility: {
       type: Boolean,
       default: true
