@@ -1,13 +1,67 @@
 const Song = require("../models/Song");
 
-// Create Song
 
+
+// Create Song
 exports.createSong = async (req, res) => {
   try {
-    const song = await Song.create(req.body);
+    // 1. Pull the fields parsed out by Multer
+    const { songName, singer, albumName, musicDirector, songUrl } = req.body;
+
+    // 2. Validate that none of the required strings arrived blank
+    if (!songName || !singer || !albumName || !musicDirector || !songUrl) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields (Song Name, Singer, Album, Music Director, Song URL) are strictly required."
+      });
+    }
+
+    // 3. Assemble a clean dataset matching your Schema fields exactly
+    const songData = {
+      songName,
+      singer,
+      albumName,
+      musicDirector,
+      songUrl,
+      artworkUrl100: "" // Default empty if no file is provided
+    };
+
+    // 4. Check if an image file was uploaded
+    if (req.file) {
+      songData.artworkUrl100 = `/uploads/${req.file.filename}`;
+    }
+
+    // 5. Save cleanly to MongoDB
+    const song = await Song.create(songData);
 
     res.status(201).json(song);
   } catch (error) {
+    // This logs the exact error details into your Node/Express terminal window
+    console.error("🚨 MONGOOSE CREATION ERROR:", error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Update Song
+exports.updateSong = async (req, res) => {
+  try {
+    console.log("===============");
+    console.log("ID:", req.params.id);
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+    console.log("===============");
+
+    return res.json({
+      success: true,
+      body: req.body,
+      file: req.file,
+    });
+  } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       message: error.message,
     });
@@ -63,24 +117,6 @@ exports.getSongById = async (req, res) => {
     });
   }
 };
-
-// Update Song
-
-exports.updateSong = async (req, res) => {
-  try {
-    const song = await Song.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-
-    res.json(song);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
-
-// Delete Song
 
 exports.deleteSong = async (req, res) => {
   try {

@@ -1,45 +1,46 @@
 const mongoose = require("mongoose");
 
 const songSchema = new mongoose.Schema(
-{
-  songName:{
-    type:String,
-    required:true
-  },
+  {
+    songName: {
+      type: String,
+      required: true
+    },
 
-  singer:{
-    type:String,
-    required:true
-  },
+    singer: {
+      type: String,
+      required: true
+    },
 
-  albumName:{
-    type:String,
-    required:true
-  },
+    albumName: {
+      type: String,
+      required: true
+    },
 
-  musicDirector:{
-    type:String,
-    required:true
-  },
+    musicDirector: {
+      type: String,
+      required: true
+    },
 
-  songUrl:{
-    type:String,
-    required:true
-  },
+    songUrl: {
+      type: String,
+      required: true
+    },
 
-  visibility:{
-    type:Boolean,
-    default:true
+    // 👇 ADD THIS FIELD RIGHT HERE SO MONGODB CAN STORE THE FILE PATH STRING!
+    artworkUrl100: {
+      type: String,
+      default: "" 
+    },
+
+    visibility: {
+      type: Boolean,
+      default: true
+    }
+  },
+  {
+    timestamps: true
   }
-
-},
-{
-  timestamps:true
-}
 );
 
-module.exports =
-mongoose.model(
-"Song",
-songSchema
-);
+module.exports = mongoose.model("Song", songSchema);
