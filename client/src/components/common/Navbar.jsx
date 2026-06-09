@@ -11,10 +11,23 @@ function Navbar() {
   const [notifications, setNotifications] = useState([]);
   const isMenuOpen = Boolean(anchorEl);
 
+  // 🎯 ROLE CHECK: Read credentials safely from local storage context
+  const currentUser = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  })();
+  
+  const isAdmin = currentUser?.role === "ADMIN";
+
   useEffect(() => {
+    // 🎯 BLOCK 1: If the user is an admin, do not fetch previous notifications from database
+    if (isAdmin) return;
+
     fetchNotifications();
 
-    // 🎯 OPTIMIZATION: Keeps a single socket pipeline alive instead of creating duplicates
     const socket = io("http://localhost:5000", {
       autoConnect: true,
       reconnectionAttempts: 5
@@ -25,10 +38,16 @@ function Navbar() {
     });
 
     socket.on("new_song_notification", (incomingAlert) => {
+      // 🎯 BLOCK 2: If the live logged-in user is an admin, ignore the incoming real-time socket alert
+      if (isAdmin) return;
+
       console.log("🔔 Socket caught real-time alert event data:", incomingAlert);
       
       if (incomingAlert?.message) {
         setNotifications((prevList) => {
+          const dismissedIds = JSON.parse(localStorage.getItem("dismissedNotifications") || "[]");
+          if (dismissedIds.includes(incomingAlert._id)) return prevList;
+
           const exists = prevList.some(item => item._id === incomingAlert._id);
           if (exists) return prevList;
           return [incomingAlert, ...prevList];
@@ -40,7 +59,7 @@ function Navbar() {
       socket.off("new_song_notification");
       socket.disconnect();
     };
-  }, []);
+  }, [isAdmin]); // Added dependency to re-run safely if login roles swap contexts
 
   const fetchNotifications = async () => {
     try {
@@ -51,9 +70,10 @@ function Navbar() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // 🎯 OPTIMIZATION: Defensive validation prevents mapping on non-array results
       if (Array.isArray(res.data)) {
-        setNotifications(res.data);
+        const dismissedIds = JSON.parse(localStorage.getItem("dismissedNotifications") || "[]");
+        const activeNotifications = res.data.filter(notif => !dismissedIds.includes(notif._id));
+        setNotifications(activeNotifications);
       }
     } catch (error) {
       console.error("🚨 Failed to download notification index:", error.message);
@@ -64,9 +84,17 @@ function Navbar() {
     setAnchorEl(event.currentTarget);
   };
 
-  // 🎯 BUG FIX: Clears local notifications array when the panel dropdown gets dismissed
   const handleMenuClose = () => {
     setAnchorEl(null);
+
+    if (notifications.length > 0) {
+      const currentIds = notifications.map(n => n._id).filter(Boolean);
+      const dismissedIds = JSON.parse(localStorage.getItem("dismissedNotifications") || "[]");
+      
+      const updatedDismissed = [...new Set([...dismissedIds, ...currentIds])];
+      localStorage.setItem("dismissedNotifications", JSON.stringify(updatedDismissed));
+    }
+
     setNotifications([]); 
   };
 
@@ -92,8 +120,9 @@ function Navbar() {
         </Typography>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          {/* 🎯 UI HIDDEN/ZERO STATE: If an Admin logs in, the badge stays locked at 0 */}
           <IconButton color="inherit" onClick={handleMenuOpen}>
-            <Badge badgeContent={notifications.length} color="error">
+            <Badge badgeContent={isAdmin ? 0 : notifications.length} color="error">
               <Notifications />
             </Badge>
           </IconButton>
@@ -118,7 +147,8 @@ function Navbar() {
           </Typography>
           <Divider />
 
-          {notifications.length === 0 ? (
+          {/* If Admin opens the panel or there are no items, show the clean empty state layout */}
+          {isAdmin || notifications.length === 0 ? (
             <MenuItem onClick={handleMenuClose} sx={{ color: "gray", fontSize: "0.9rem", py: 2 }}>
               No new songs added recently.
             </MenuItem>

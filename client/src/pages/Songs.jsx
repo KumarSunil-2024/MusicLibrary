@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import SidebarSongs from "../components/SidebarSongs";
-import SearchBar from "../components/SearchBar";
+import SidebarSongs from "../components/common/SidebarSongs";
+import SearchBar from "../pages/SearchBar";
 import MusicPlayer from "../pages/MusicPlayer";
 import api from "../services/api";
 

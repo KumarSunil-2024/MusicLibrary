@@ -11,7 +11,7 @@ import Playlists from "../pages/Playlists";
 import AdminDashboard from "../pages/AdminDashboard";
 import ManageSongs from "../pages/ManageSongs";
 
-import ProtectedRoute from "../components/ProtectedRoute";
+import ProtectedRoute from "../routes/ProtectedRoute";
 
 function AppRoutes() {
   return (
