@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+
+const { protect, admin } = require("../middleware/authMiddleware"); // 🎯 FIXED: Imports your middleware guards
 const {
   createSong,
   getSongs,
@@ -10,15 +12,15 @@ const {
   toggleVisibility,
 } = require("../controllers/songController");
 
-// 1. Static Core Route Maps (Put these on top!)
-router.get("/", getSongs);
-router.post("/", createSong);
-router.get("/admin/all", getAllSongs); // Now processes safely without getting blocked!
+// 1. Core User Discovery Actions (Open to logged-in accounts)
+router.get("/", protect, getSongs);
+router.get("/:id", protect, getSongById);
 
-// 2. Dynamic Wildcard Catch-All Routes (Put these on the bottom)
-router.get("/:id", getSongById);
-router.put("/:id", updateSong);
-router.put("/:id/visibility", toggleVisibility);
-router.delete("/:id", deleteSong);
+// 2. Core Admin Administration Framework Rules (Strictly locked by role check flags)
+router.post("/", protect, admin, createSong);
+router.get("/admin/all", protect, admin, getAllSongs); // 🎯 FIXED: No longer vulnerable to standard user snooping
+router.put("/:id", protect, admin, updateSong);
+router.put("/:id/visibility", protect, admin, toggleVisibility); // 🎯 FIXED: Securely protected toggle
+router.delete("/:id", protect, admin, deleteSong);
 
 module.exports = router;

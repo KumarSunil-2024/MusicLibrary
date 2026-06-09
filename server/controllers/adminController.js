@@ -1,78 +1,33 @@
-const User = require("../models/User");
+const userService = require("../services/userService");
 
-// Get All Users
-
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find().select("-password");
-
-    res.json(users);
-  } catch (error) {
+const asyncHandler = (fn) => (req, res, next) => {
+  fn(req, res, next).catch((err) => {
     res.status(500).json({
-      message: error.message,
+      success: false,
+      message: err.message,
     });
-  }
+  });
 };
 
-// Get Single User
+exports.getUsers = asyncHandler(async (req, res) => {
+  const users = await userService.getAllUsersMaster();
+  res.json(users);
+});
 
-const getUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).select("-password");
+exports.getUser = asyncHandler(async (req, res) => {
+  const user = await userService.getUserDetailsById(req.params.id);
+  res.json(user);
+});
 
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
+exports.updateUser = asyncHandler(async (req, res) => {
+  const user = await userService.adminModifyUser(req.params.id, req.body);
+  res.json(user);
+});
 
-// Update User
-
-const updateUser = async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        name: req.body.name,
-        email: req.body.email,
-        phone: req.body.phone,
-        role: req.body.role,
-      },
-      {
-        new: true,
-      },
-    );
-
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
-
-// Delete User
-
-const deleteUser = async (req, res) => {
-  try {
-    await User.findByIdAndDelete(req.params.id);
-
-    res.json({
-      success: true,
-      message: "User Deleted",
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
-};
-
-module.exports = {
-  getUsers,
-  getUser,
-  updateUser,
-  deleteUser,
-};
+exports.deleteUser = asyncHandler(async (req, res) => {
+  await userService.removeUserRecord(req.params.id);
+  res.json({
+    success: true,
+    message: "User Deleted Successfully",
+  });
+});
