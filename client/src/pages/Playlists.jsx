@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import MusicPlayer from "../pages/MusicPlayer"; 
 import api from "../services/api";
 
@@ -8,19 +8,17 @@ function Playlists() {
   const [search, setSearch] = useState("");
   const [currentSong, setCurrentSong] = useState(null); 
 
-  // 1. SIMPLE & EXPLICIT FETCH LOGIC
-  const fetchPlaylists = async () => {
+  // 1. MEMOIZED SANITIZATION FUNCTION (Prevents recreation on every lifecycle pass)
+  const fetchPlaylists = useCallback(async () => {
     try {
       const res = await api.get("/playlists");
       const rawData = res.data || [];
 
-      // Loop through data and ensure standard keys exist across all objects
       const sanitized = rawData.map(playlist => {
         const rawSongs = playlist.songs || [];
         
         const standardSongs = rawSongs.map(s => {
           if (!s) return null;
-          
           return {
             _id: s._id,
             trackId: s.trackId || s._id,
@@ -38,13 +36,13 @@ function Playlists() {
     } catch (err) { 
       console.error("Error fetching playlists:", err); 
     }
-  };
+  }, []);
 
   useEffect(() => { 
     fetchPlaylists(); 
-  }, []);
+  }, [fetchPlaylists]);
 
-  // 2. EXPLICIT API CRUD OPERATIONS (No dynamic bracket properties)
+  // 2. EXPLICIT API CRUD OPERATIONS
   const createPlaylist = async () => {
     if (!name.trim()) return alert("Enter Playlist Name");
     try {
@@ -79,20 +77,23 @@ function Playlists() {
 
   const removeSongFromPlaylist = async (playlistId, songId) => {
     try {
+      // Clear player engine state first if the currently playing song is being deleted
       if (currentSong && (currentSong.trackId === songId || currentSong._id === songId)) {
-        setCurrentSong(null); // Clear player state if active track is removed
+        setCurrentSong(null); 
       }
-      await api.put(`/playlists/${playlistId}/remove-song/${songId}`);
+
+      // 🎯 THE FIX: Explicitly send songId inside data payload body alongside url routing
+      await api.put(`/playlists/${playlistId}/remove-song/${songId}`, { songId });
+      
       fetchPlaylists();
     } catch (err) {
       console.error("Remove song failed:", err);
     }
   };
 
-  // 3. CLEAN TRACK INTERACTION QUEUE STRATEGY
+  // 3. TRACK INTERACTION QUEUE STRATEGY
   const cleanQuery = useMemo(() => search.toLowerCase().trim(), [search]);
 
-  // Combined tracks that match our current search filter query
   const filteredQueue = useMemo(() => {
     return playlists.flatMap(p => p.songs).filter(s => 
       s.trackName.toLowerCase().includes(cleanQuery) || 
@@ -114,7 +115,6 @@ function Playlists() {
   return (
     <div className="container py-3" style={{ color: "#2c3e50" }}>
       
-      {/* TITLE HUB HEADER - Fully Responsive Breakpoints */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
           <h2 className="fw-bold m-0" style={{ letterSpacing: "-0.5px", color: "#1e3a8a" }}>🎧 My Playlists</h2>
@@ -132,8 +132,6 @@ function Playlists() {
       </div>
 
       <div className="row g-3">
-        
-        {/* LEFT COLUMN: CREATION CARD */}
         <div className="col-md-4">
           <div className="card p-3 shadow-sm border" style={{ backgroundColor: "#f8fafc", borderRadius: "10px" }}>
             <h6 className="fw-bold mb-2" style={{ color: "#1e3a8a" }}>New Collection</h6>
@@ -150,7 +148,6 @@ function Playlists() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: RENDER PLAYLIST CARDS + AUDIO FOOTER */}
         <div className="col-md-8 d-flex flex-column gap-3">
           {playlists.length === 0 ? (
             <div className="text-center py-4 rounded border border-secondary border-dashed bg-light">
@@ -158,7 +155,6 @@ function Playlists() {
             </div>
           ) : (
             playlists.map((p) => {
-              // Local layout search filtering
               const localFilteredSongs = p.songs.filter(s => 
                 s.trackName.toLowerCase().includes(cleanQuery) || s.artistName.toLowerCase().includes(cleanQuery)
               );
@@ -166,7 +162,6 @@ function Playlists() {
               return (
                 <div key={p._id} className="card border shadow-sm" style={{ borderRadius: "10px", overflow: "hidden" }}>
                   
-                  {/* Playlist Header Block */}
                   <div className="px-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-light">
                     <div style={{ minWidth: 0 }} className="me-2">
                       <h5 className="fw-bold m-0 d-inline-block text-dark text-truncate align-middle" style={{ maxWidth: "160px" }}>{p.name}</h5>
@@ -178,7 +173,6 @@ function Playlists() {
                     </div>
                   </div>
 
-                  {/* Songs Table List */}
                   <div className="card-body p-2 bg-white">
                     {localFilteredSongs.length === 0 ? (
                       <p className="text-muted m-0 py-2 text-center" style={{ fontSize: "0.85rem" }}>No matching songs found</p>
@@ -230,10 +224,8 @@ function Playlists() {
             })
           )}
           
-          {/* Global Shared Player Engine */}
           <MusicPlayer currentSong={currentSong} nextSong={() => shiftTrack(1)} previousSong={() => shiftTrack(-1)} />
         </div>
-
       </div>
     </div>
   );

@@ -1,153 +1,128 @@
 const Playlist = require("../models/Playlist");
-// Import Playlist model
-
 const Song = require("../models/Song");
-// Import Song model
 
 class PlaylistService {
-  // Playlist service class
-
   async getUserPlaylists(userId) {
-    // Get user playlists
-
-    if (!userId) {
-      // Check user ID
-      throw new Error("User identifier required");
-    }
-
-    return await Playlist.find({ userId }).populate("songs");
-    // Fetch playlists
+    if (!userId) throw new Error("User identifier required");
+    return Playlist.find({ userId });
   }
 
   async createNewPlaylist(name, userId) {
-    // Create playlist
-
     if (!name?.trim() || !userId) {
-      // Validate inputs
       throw new Error("Playlist title and user identifier are required");
     }
-
-    return await Playlist.create({
-      name: name.trim(),
-      userId,
-    });
-    // Save playlist
+    return Playlist.create({ name: name.trim(), userId });
   }
 
   async removePlaylistById(id) {
-    // Delete playlist
+    if (!id) throw new Error("Playlist ID required");
 
-    if (!id) {
-      // Check playlist ID
-      throw new Error("Playlist ID required");
-    }
+    const playlist = await Playlist.findByIdAndDelete(id);
+    if (!playlist) throw new Error("Playlist Not Found");
 
-    const deleted = await Playlist.findByIdAndDelete(id);
-    // Delete from database
-
-    if (!deleted) {
-      // Playlist not found
-      throw new Error("Playlist Not Found");
-    }
-
-    return deleted;
-    // Return deleted playlist
+    return playlist;
   }
 
   async pushSongToCollection(playlistId, songId) {
-    // Add song to playlist
-
     if (!playlistId || !songId) {
-      // Validate IDs
       throw new Error("Playlist ID and Song ID are required");
     }
 
     const song = await Song.findById(songId);
-    // Find song
-
-    if (!song) {
-      // Song not found
-      throw new Error("Song not found");
-    }
+    if (!song) throw new Error("Song not found");
 
     const payload = {
-      // Create song object
-      _id: song._id,
-      trackId: Number(song.trackId),
-      trackName: song.songName,
-      artistName: song.singer,
-      albumName: song.albumName,
-      artworkUrl: song.image,
-      previewUrl: song.songUrl,
+      trackId: Date.now(), // Local timestamp fallback identity
+      trackName: song.songName || song.songTitle || "Unknown Track",
+      artistName: song.singer || "Unknown Artist",
+      albumName: song.albumName || song.albumTitle || "Unknown Album",
+      artworkUrl: song.image || "",
+      previewUrl: song.songUrl || "",
+      releaseDate: new Date().toISOString(),
+      genre: "",
     };
 
     const updated = await Playlist.findByIdAndUpdate(
       playlistId,
-      {
-        $push: {
-          songs: payload,
-        },
-      },
-      {
-        returnDocument: "after",
-      }
+      { $push: { songs: payload } },
+      { new: true, runValidators: true },
     );
-    // Add song
 
+    if (!updated) throw new Error("Playlist not found");
     return updated;
-    // Return updated playlist
   }
 
-  async pullSongFromCollection(playlistId, songId) {
-    // Remove song
-
-    if (!playlistId || !songId) {
-      // Validate IDs
-      throw new Error("Playlist ID and Song ID are required");
+  async pushItunesSongToCollection(playlistId, songData) {
+    if (!playlistId || !songData) {
+      throw new Error("Playlist ID and song data are required");
     }
+
+    const payload = {
+      trackId: Number(songData.trackId) || Date.now(),
+      trackName: songData.trackName || "Unknown Track",
+      artistName: songData.artistName || "Unknown Artist",
+      albumName: songData.albumName || "Unknown Album",
+      artworkUrl: songData.artworkUrl || "",
+      previewUrl: songData.previewUrl || "",
+      releaseDate: songData.releaseDate || new Date().toISOString(),
+      genre: songData.genre || "",
+    };
+
+    const updated = await Playlist.findByIdAndUpdate(
+      playlistId,
+      { $push: { songs: payload } },
+      { new: true, runValidators: true },
+    );
+
+    if (!updated) throw new Error("Playlist not found");
+    return updated;
+  }
+
+  // 🎯 FIXED & OPTIMIZED SUB-COLLECTION REMOVAL ENGINE
+  async pullSongFromCollection(playlistId, targetId) {
+    if (!playlistId || !targetId) {
+      throw new Error(
+        "Playlist ID and Track target identification are required",
+      );
+    }
+
+    // Try converting to a number safely. If it fails (NaN), preserve original format (like Hex String)
+    const numericId = Number(targetId);
+    const finalizedTrackId = isNaN(numericId) ? targetId : numericId;
 
     const updated = await Playlist.findByIdAndUpdate(
       playlistId,
       {
         $pull: {
           songs: {
-            _id: songId,
+            $or: [
+              { _id: targetId }, // Match by subdocument Mongoose Object ID
+              { trackId: finalizedTrackId }, // Match by iTunes Number ID or fallback identifier
+            ],
           },
         },
       },
-      {
-        returnDocument: "after",
-      }
+      { new: true },
     );
-    // Remove song
 
+    if (!updated) throw new Error("Playlist not found");
     return updated;
-    // Return playlist
   }
 
   async updatePlaylistTitle(id, newName) {
-    // Rename playlist
-
     if (!id || !newName?.trim()) {
-      // Validate data
       throw new Error("Playlist ID and title required");
     }
 
     const updated = await Playlist.findByIdAndUpdate(
       id,
-      {
-        name: newName.trim(),
-      },
-      {
-        returnDocument: "after",
-      }
+      { name: newName.trim() },
+      { new: true },
     );
-    // Update playlist name
 
+    if (!updated) throw new Error("Playlist not found");
     return updated;
-    // Return updated playlist
   }
 }
 
 module.exports = new PlaylistService();
-// Export service instance

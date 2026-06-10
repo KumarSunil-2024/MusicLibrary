@@ -15,20 +15,16 @@ const playlistSchema = new mongoose.Schema(
 
     songs: [
       {
-        trackId: Number,
-
+        // 🎯 THE CRITICAL FIX: Allow both Strings (Local IDs) and Numbers (iTunes IDs)
+        trackId: {
+          type: mongoose.Schema.Types.Mixed,
+        },
         trackName: String,
-
         artistName: String,
-
         albumName: String,
-
         artworkUrl: String,
-
         previewUrl: String,
-
         releaseDate: String,
-
         genre: String,
       },
     ],
@@ -38,7 +34,4 @@ const playlistSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model(
-  "Playlist",
-  playlistSchema
-);
+module.exports = mongoose.model("Playlist", playlistSchema);
