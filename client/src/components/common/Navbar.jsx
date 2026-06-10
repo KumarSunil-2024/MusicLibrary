@@ -6,24 +6,24 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Navbar() {
-  // NAVIGATION AND STYLING HOOKS
+  // NAVIGATION ROUTING HOOK INSTANCES
   const navigate = useNavigate();
   const theme = useTheme();
   
-  // MOBILE RESPONSIVENESS MEDIA QUERY
+  // MOBILE VIEW BREAKPOINT SENSING
   const isMobile = useMediaQuery(theme.breakpoints.down("sm")); 
   
-  // COMPONENT REACT STATE VARIABLES
+  // COMPONENT ACTIVE STORAGE STATES
   const [anchorEl, setAnchorEl] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const isMenuOpen = Boolean(anchorEl);
 
-  // USER ACCESS ROLE CHECKING
+  // USER ACCESS PRIVILEGES CHECK
   const userString = localStorage.getItem("user");
   const currentUser = userString ? JSON.parse(userString) : null;
   const isAdmin = currentUser?.role === "ADMIN";
 
-  // FETCH OLD NOTIFICATIONS DATABASE
+  // FETCH PERSISTENT ANNOUNCEMENT ARCHIVES
   const fetchNotifications = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -41,44 +41,50 @@ function Navbar() {
     }
   };
 
-  // SOCKET REALTIME LISTENERS MANAGEMENT
+  // MANAGEMENT OF LIVE LISTENER CONNECTIONS
   useEffect(() => {
     if (isAdmin) return; 
 
     fetchNotifications();
 
-    // CONNECT WEBSOCKET SERVER INSTANCE
+    // INITIALIZE WEBSOCKET SERVER STREAM
     const socket = io("http://localhost:5000");
 
-    // RECEIVE NEW SONGS NOTIFICATION
+    // RECEIVE RUNTIME EMISSION ALERTS
     socket.on("new_song_notification", (incomingAlert) => {
       if (incomingAlert?.message) {
         setNotifications((prevList) => [incomingAlert, ...prevList]);
       }
     });
 
-    // CLEANUP DISCONNECT WEBSOCKET CONNECTION
+    // CLEANUP LIVED SOCKET LIFECYCLE
     return () => {
       socket.disconnect();
     };
   }, [isAdmin]);
 
-  // TOGGLE NOTIFICATION DROPDOWN MENU
-  const handleMenuOpen = (e) => setAnchorEl(e.currentTarget);
-  const handleMenuClose = () => setAnchorEl(null);
+  // OPEN NOTIFICATION MENU ACCORDION
+  const handleMenuOpen = (e) => {
+    setAnchorEl(e.currentTarget);
+  };
 
-  // CLEAR LOGGED USER SESSION
+  // CLOSE MENU CLEAR BADGE
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setNotifications([]); 
+  };
+
+  // PURGE LOGGED SESSION INSTANCE
   const logout = () => {
     localStorage.clear(); 
     navigate("/"); 
   };
 
   return (
-    // HEADER APPLICATION TOP BAR
     <AppBar position="static">
       <Toolbar sx={{ justifyContent: "space-between" }}>
         
-        {/* APP BRAND LOGO UI */}
+        {/* BRAND IDENTITY UI FRAME */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <LibraryMusic sx={{ mr: 1 }} />
           <Typography variant="h6" component="div">
@@ -86,9 +92,9 @@ function Navbar() {
           </Typography>
         </Box>
 
-        {/* RIGHT CONTROLS BUTTON GROUP */}
+        {/* SYSTEM CONTROL NAVIGATION LINKS */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {/* NOTIFICATION BADGE BUTTON CLICKABLE */}
+          {/* INTERACTIVE NOTIFICATION BADGE CONTROLLER */}
           <IconButton color="inherit" onClick={handleMenuOpen}>
             <Badge badgeContent={isAdmin ? 0 : notifications.length} color="error">
               <Notifications />
@@ -96,16 +102,12 @@ function Navbar() {
           </IconButton>
 
           {/* APPLICATION USER LOGOUT BUTTON */}
-          <Button 
-            color="inherit" 
-            onClick={logout} 
-            startIcon={<Logout />}
-          >
+          <Button color="inherit" onClick={logout} startIcon={<Logout />}>
             {isMobile ? "" : "Logout"}
           </Button>
         </Box>
 
-        {/* DROPDOWN NOTIFICATIONS DISPLAY LIST */}
+        {/* NOTIFICATION FEED DROPDOWN OVERLAY */}
         <Menu
           anchorEl={anchorEl}
           open={isMenuOpen}
@@ -117,14 +119,15 @@ function Navbar() {
           </Typography>
           <Divider />
           
-          {/* CONDITIONALLY RENDER ALERTS CONTENT */}
+          {/* CONDITIONALLY CHOOSE RENDERING STATE */}
           {isAdmin || notifications.length === 0 ? (
             <MenuItem onClick={handleMenuClose} sx={{ color: "gray", py: 2 }}>
               No new songs added.
             </MenuItem>
           ) : (
             notifications.map((notif, index) => (
-              <MenuItem key={index} onClick={handleMenuClose} sx={{ whiteSpace: "normal" }}>
+              // RENDER SINGLE ALERT ITEM
+              <MenuItem key={notif._id || index} onClick={handleMenuClose} sx={{ whiteSpace: "normal" }}>
                 {notif.message}
               </MenuItem>
             ))
