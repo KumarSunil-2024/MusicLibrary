@@ -1,17 +1,24 @@
 /**
- * Role Verification Layer: Restricts administrative endpoints
- * Ensures it executes sequentially after the primary token verification middleware
+ * Admin Middleware
+ * Check admin role
  */
+
 const admin = (req, res, next) => {
-  // Defensive guard check: Prevents server crashes if the authentication layer was skipped
+  // Authorization middleware
+
   if (!req.user || req.user.role !== "ADMIN") {
+    // Verify admin role
+
     return res.status(403).json({
       success: false,
-      message: "Access Denied: Administrative Clearance Required",
+      message: "Admin Required",
     });
+    // Access denied
   }
 
   next();
+  // Allow access
 };
 
 module.exports = admin;
+// Export middleware

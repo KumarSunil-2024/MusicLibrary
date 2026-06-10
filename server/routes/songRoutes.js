@@ -1,10 +1,12 @@
 const express = require("express");
+// Import Express
+
 const router = express.Router();
+// Create router
 
-// Import authentication and authorization middleware layers
 const { protect, admin } = require("../middleware/authMiddleware");
+// Import security middleware
 
-// Import target controller business logic
 const {
   getSongs,
   getAllSongs,
@@ -13,37 +15,38 @@ const {
   deleteSong,
   toggleVisibility,
 } = require("../controllers/songController");
+// Import song functions
 
 const { adminAddSong } = require("../controllers/adminController");
+// Import add song function
 
-/* ==========================================================================
-   1. STANDARD USER ROUTING INDEX (Requires a valid login token)
-   ========================================================================== */
-
-// GET /api/songs -> Fetch standard visible catalog items
+// GET /api/songs
 router.get("/", protect, getSongs);
+// Get visible songs
 
-// GET /api/songs/:id -> View detailed data for a specific song asset
+// GET /api/songs/:id
 router.get("/:id", protect, getSongById);
+// Get single song
 
-
-/* ==========================================================================
-   2. ADMINISTRATIVE MANAGEMENT OPERATIONS (Requires Admin role clearance)
-   ========================================================================== */
-
-// POST /api/songs -> Inject a brand new song record into the database
+// POST /api/songs
 router.post("/", protect, admin, adminAddSong);
+// Add new song
 
-// GET /api/songs/admin/all -> Retrieve full catalog index (including hidden files)
+// GET /api/songs/admin/all
 router.get("/admin/all", protect, admin, getAllSongs);
+// Get all songs
 
-// PUT /api/songs/:id -> Update fields for an existing song registry entry
+// PUT /api/songs/:id
 router.put("/:id", protect, admin, updateSong);
+// Update song details
 
-// PUT /api/songs/:id/visibility -> Toggle public/private access tags
+// PUT /api/songs/:id/visibility
 router.put("/:id/visibility", protect, admin, toggleVisibility);
+// Change visibility
 
-// DELETE /api/songs/:id -> Safely drop a record permanently from the database
+// DELETE /api/songs/:id
 router.delete("/:id", protect, admin, deleteSong);
+// Delete song
 
 module.exports = router;
+// Export router

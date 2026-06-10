@@ -1,102 +1,179 @@
 const Song = require("../models/Song");
+// Import Song model
 
 class SongService {
-  // 1. CREATE TRACK: Normalizes dual keys and persists new records
+  // Song service class
+
   async createNewSong(bodyData) {
+    // Create new song
+
     if (!bodyData) {
+      // Check request data
       throw new Error("No request payload provided");
     }
 
-    const { songName, songTitle, singer, albumName, albumTitle, musicDirector, songUrl, image } = bodyData;
+    const {
+      songName,
+      songTitle,
+      singer,
+      albumName,
+      albumTitle,
+      musicDirector,
+      songUrl,
+      image,
+    } = bodyData;
+    // Extract song data
 
-    // Bridge field name mismatches gracefully
     const finalName = (songName || songTitle)?.trim();
-    const finalAlbum = (albumName || albumTitle)?.trim();
+    // Get song name
 
-    if (!finalName || !singer?.trim() || !finalAlbum || !musicDirector?.trim() || !songUrl?.trim()) {
-      throw new Error("All fields (Song Name, Singer, Album, Music Director, Song URL) are required.");
+    const finalAlbum = (albumName || albumTitle)?.trim();
+    // Get album name
+
+    if (
+      !finalName ||
+      !singer?.trim() ||
+      !finalAlbum ||
+      !musicDirector?.trim() ||
+      !songUrl?.trim()
+    ) {
+      // Validate fields
+      throw new Error("All fields required");
     }
 
     return await Song.create({
       songName: finalName,
-      songTitle: finalName, // Maintained for frontend compatibility
+      songTitle: finalName,
       singer: singer.trim(),
       albumName: finalAlbum,
-      albumTitle: finalAlbum, // Maintained for frontend compatibility
+      albumTitle: finalAlbum,
       musicDirector: musicDirector.trim(),
       songUrl: songUrl.trim(),
       image: image || "",
     });
+    // Save song
   }
 
-  // 2. UPDATE TRACK: Overrides record modifications with validator gates
   async updateSongById(id, updateData) {
+    // Update song
+
     if (!id || !updateData) {
-      throw new Error("Missing record identifier or payload updates");
+      // Check inputs
+      throw new Error("Missing data");
     }
 
     const data = { ...updateData };
-    
-    // Mirror structural adjustments across compatibility parameters
+    // Copy update data
+
     if (data.songName) data.songTitle = data.songName;
+    // Sync song title
+
     if (data.albumName) data.albumTitle = data.albumName;
+    // Sync album title
 
     const updated = await Song.findByIdAndUpdate(
       id,
       { $set: data },
-      { returnDocument: "after", runValidators: true }
+      {
+        returnDocument: "after",
+        runValidators: true,
+      },
     );
-    
+    // Update database
+
     if (!updated) {
+      // Song not found
       throw new Error("Song Not Found");
     }
-    
+
     return updated;
+    // Return updated song
   }
 
-  // 3. RETRIEVE CLIENT INDEX: Fetches active public records for users
   async getVisibleSongs() {
+    // Get visible songs
+
     return await Song.find({
-      $or: [
-        { visibility: true },
-        { visibility: { $exists: false } } // Catches records created before visibility rules existed
-      ]
+      $or: [{ visibility: true }, { visibility: { $exists: false } }],
     }).sort({ createdAt: -1 });
+    // Fetch public songs
   }
 
-  // 4. RETRIEVE ADMINISTRATIVE MASTER INDEX: Fetches all files
   async getAllSongsMaster() {
-    return await Song.find().sort({ createdAt: -1 });
+    // Get all songs
+
+    return await Song.find().sort({
+      createdAt: -1,
+    });
+    // Fetch all songs
   }
 
-  // 5. VIEW TRACK METADATA
   async getSongDetails(id) {
-    if (!id) throw new Error("Track ID required");
+    // Get song details
+
+    if (!id) {
+      // Check song ID
+      throw new Error("Track ID required");
+    }
+
     const song = await Song.findById(id);
-    if (!song) throw new Error("Song Not Found");
+    // Find song
+
+    if (!song) {
+      // Song not found
+      throw new Error("Song Not Found");
+    }
+
     return song;
+    // Return song
   }
 
-  // 6. DETACH TRACK
   async removeSongFromDb(id) {
-    if (!id) throw new Error("Track ID required");
+    // Delete song
+
+    if (!id) {
+      // Check song ID
+      throw new Error("Track ID required");
+    }
+
     const song = await Song.findByIdAndDelete(id);
-    if (!song) throw new Error("Song Not Found");
+    // Delete song
+
+    if (!song) {
+      // Song not found
+      throw new Error("Song Not Found");
+    }
+
     return song;
+    // Return deleted song
   }
 
-  // 7. TOGGLE SYSTEM VISIBILITY: Swaps track accessibility states instantly
   async toggleSongVisibilityState(id) {
-    if (!id) throw new Error("Track ID required");
-    const song = await Song.findById(id);
-    if (!song) throw new Error("Song Not Found");
+    // Change visibility
 
-    // Explicit boolean structural inversion
+    if (!id) {
+      // Check song ID
+      throw new Error("Track ID required");
+    }
+
+    const song = await Song.findById(id);
+    // Find song
+
+    if (!song) {
+      // Song not found
+      throw new Error("Song Not Found");
+    }
+
     song.visibility = song.visibility !== false ? false : true;
+    // Toggle visibility
+
     await song.save();
+    // Save changes
+
     return song;
+    // Return updated song
   }
 }
 
-// Export a single initialized instance of the service class
 module.exports = new SongService();
+// Export service

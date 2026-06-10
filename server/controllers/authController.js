@@ -1,91 +1,103 @@
 const authService = require("../services/authService");
-const userService = require("../services/userService");
+// Import auth service
 
-// Unified Async Error Handler Wrapper (With clean HTTP mapping rules)
+const userService = require("../services/userService");
+// Import user service
+
 const asyncHandler = (fn) => (req, res, next) => {
+  // Handle async errors
+
   fn(req, res, next).catch((err) => {
-    // Determine context-appropriate HTTP status code
-    let statusCode = 400; // Bad Request fallback
+    // Catch errors
+
+    let statusCode = 400;
+    // Default status code
+
     if (err.message.includes("Not Found")) statusCode = 404;
-    else if (err.message.includes("already exists")) statusCode = 409; // Conflict
+    // Resource not found
+    else if (err.message.includes("already exists")) statusCode = 409;
+    // Duplicate record
 
     res.status(statusCode).json({
       success: false,
       message: err.message,
     });
+    // Send error response
   });
 };
 
-/* ==========================================================================
-   1. REGISTRATION & SESSION MANAGEMENT (Delegates to AuthService)
-   ========================================================================== */
-
-// POST /api/auth/register -> Creates an account with normalized data attributes
+// Register User
 exports.register = asyncHandler(async (req, res) => {
-  // Gracefully handles both frontend email parameter names
   const normalizedData = {
     ...req.body,
-    email: req.body.email || req.body.emailId
+    email: req.body.email || req.body.emailId,
   };
+  // Normalize email field
 
   const user = await authService.registerUser(normalizedData);
-  
+  // Create user
+
   res.status(201).json({
     success: true,
     message: "User Registered Successfully",
     user,
   });
+  // Send success response
 });
 
-// POST /api/auth/login -> Validates credentials and returns signed JWT strings
+// Login User
 exports.login = asyncHandler(async (req, res) => {
   const emailTarget = req.body.email || req.body.emailId;
-  
+  // Get email
+
   const result = await authService.loginUser(emailTarget, req.body.password);
-  
+  // Verify credentials
+
   res.status(200).json({
     success: true,
     token: result.token,
-    user: result.user
+    user: result.user,
   });
+  // Return token
 });
 
-
-/* ==========================================================================
-   2. INDIVIDUAL CLIENT SELF PROFILE MANAGEMENT (Delegates to UserService)
-   ========================================================================== */
-
-// GET /api/auth/profile -> Reads active user record (Excludes password hash)
+// Get Profile
 exports.getProfile = asyncHandler(async (req, res) => {
   const user = await userService.getUserDetailsById(req.user.id);
-  
+  // Get user profile
+
   res.status(200).json({
     success: true,
     user,
   });
+  // Send profile
 });
 
-// PUT /api/auth/profile -> Modifies editable profile details (Name, Phone)
+// Update Profile
 exports.updateProfile = asyncHandler(async (req, res) => {
   const updatedUser = await userService.mutateSelfProfile(
-    req.user.id, 
-    req.body.name, 
-    req.body.phone
+    req.user.id,
+    req.body.name,
+    req.body.phone,
   );
-  
+  // Update profile
+
   res.status(200).json({
     success: true,
     message: "Profile Updated Successfully",
     user: updatedUser,
   });
+  // Send updated data
 });
 
-// DELETE /api/auth/profile -> Allows active member to purge their account context
+// Delete Profile
 exports.deleteProfile = asyncHandler(async (req, res) => {
   await userService.removeUserRecord(req.user.id);
-  
+  // Delete account
+
   res.status(200).json({
     success: true,
     message: "Account Deleted Successfully",
   });
+  // Send success response
 });

@@ -1,64 +1,80 @@
 const jwt = require("jsonwebtoken");
+// Import JWT package
 
-// 1. AUTHENTICATION LAYER: Validates incoming tokens and binds identity
 const protect = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  // Authentication middleware
 
-  // Check if header exists
+  const authHeader = req.headers.authorization;
+  // Get token header
+
   if (!authHeader) {
+    // Check token exists
+
     return res.status(401).json({
       success: false,
-      message: "Access Denied: No Token Provided",
+      message: "No Token Provided",
     });
+    // Access denied
   }
 
   try {
-    // Extract token cleanly whether it uses Bearer format or raw strings
     const token = authHeader.startsWith("Bearer ")
       ? authHeader.split(" ")[1]
       : authHeader;
+    // Extract token
 
     if (!token) {
+      // Check token
+
       return res.status(401).json({
         success: false,
-        message: "Access Denied: Token Missing From Header",
+        message: "Token Missing",
       });
+      // Access denied
     }
 
-    // Verify token validity using environment secret
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Verify JWT
 
-    // Bind clean payload parameters explicitly to the request thread
     req.user = {
       id: decoded.id || decoded._id,
       role: decoded.role ? decoded.role.toUpperCase() : "USER",
     };
+    // Store user data
 
     next();
+    // Go next middleware
   } catch (error) {
-    console.error("JWT Verification Error:", error.message);
+    console.error(error.message);
+    // Print error
+
     return res.status(401).json({
       success: false,
-      message: "Authentication Failed: Session Invalid or Expired",
+      message: "Invalid Token",
     });
+    // Authentication failed
   }
 };
 
-// 2. AUTHORIZATION LAYER: Restricts routes to Administrator role only
 const admin = (req, res, next) => {
-  // Defensive check prevents server from crashing if protect middleware was skipped
+  // Authorization middleware
+
   if (!req.user || req.user.role !== "ADMIN") {
+    // Check admin role
+
     return res.status(403).json({
       success: false,
-      message: "Access Denied: Administrative Clearance Required",
+      message: "Admin Required",
     });
+    // Access denied
   }
-  
+
   next();
+  // Allow access
 };
 
-// Export middleware functions as a unified object module
-module.exports = { 
-  protect, 
-  admin 
+module.exports = {
+  protect,
+  admin,
 };
+// Export middleware

@@ -1,72 +1,110 @@
 const Song = require("../models/Song");
-const adminService = require("../services/adminService");
-const userService = require("../services/userService");
+// Import Song model
 
-// Unified Async Error Handler Wrapper
+const adminService = require("../services/adminService");
+// Import admin service
+
+const userService = require("../services/userService");
+// Import user service
+
 const asyncHandler = (fn) => (req, res, next) => {
+  // Handle async errors
+
   fn(req, res, next).catch((err) => {
-    console.error("🚨 Controller execution failure:", err.message);
-    res.status(500).json({ success: false, message: err.message });
+    // Catch errors
+
+    console.error(err.message);
+    // Print error
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+    // Send error response
   });
 };
 
-/* ==========================================================================
-   1. CATALOG & LIVE BROADCAST OPERATIONS
-   ========================================================================== */
-
-// POST /api/admin/songs -> Adds a song and fires a live socket alert
+// Add Song
 exports.adminAddSong = asyncHandler(async (req, res) => {
-  console.log("📥 Processing song upload payload:", req.body);
-  
   const adminId = req.user?.id || null;
+  // Get admin ID
 
-  // Delegate business logic completely to the AdminService layer
   const song = await adminService.addSongAndNotify(req.body, adminId);
+  // Save song
 
-  res.status(201).json({ 
-    success: true, 
-    message: "Song cataloged and broadcast successfully",
-    song 
+  res.status(201).json({
+    success: true,
+    message: "Song added successfully",
+    song,
   });
+  // Send response
 });
 
-// PUT /api/admin/songs/:id -> Modifies song metadata fields
+// Update Song
 exports.adminUpdateSong = asyncHandler(async (req, res) => {
-  const updatedSong = await adminService.updateLibrarySong(req.params.id, req.body);
-  res.json({ success: true, song: updatedSong });
+  const updatedSong = await adminService.updateLibrarySong(
+    req.params.id,
+    req.body,
+  );
+  // Update song
+
+  res.json({
+    success: true,
+    song: updatedSong,
+  });
+  // Return song
 });
 
-// DELETE /api/admin/songs/:id -> Drops a song permanently from the database
+// Delete Song
 exports.adminDeleteSong = asyncHandler(async (req, res) => {
   await adminService.deleteLibrarySong(req.params.id);
-  res.json({ success: true, message: "Song removed from database" });
+  // Delete song
+
+  res.json({
+    success: true,
+    message: "Song deleted",
+  });
+  // Send response
 });
 
-
-/* ==========================================================================
-   2. SYSTEM USER ACCOUNT MANAGEMENT (Delegates to UserService)
-   ========================================================================== */
-
-// GET /api/admin/users -> Fetch full list of profiles (Excludes passwords)
+// Get Users
 exports.getUsers = asyncHandler(async (req, res) => {
   const users = await userService.getAllUsersMaster();
+  // Fetch users
+
   res.json(users);
+  // Return users
 });
 
-// GET /api/admin/users/:id -> Read a specific profile entity
+// Get Single User
 exports.getUser = asyncHandler(async (req, res) => {
   const user = await userService.getUserDetailsById(req.params.id);
+  // Find user
+
   res.json(user);
+  // Return user
 });
 
-// PUT /api/admin/users/:id -> Modify an account profile node
+// Update User
 exports.updateUser = asyncHandler(async (req, res) => {
-  const updatedUser = await userService.adminModifyUser(req.params.id, req.body);
+  const updatedUser = await userService.adminModifyUser(
+    req.params.id,
+    req.body,
+  );
+  // Update user
+
   res.json(updatedUser);
+  // Return updated user
 });
 
-// DELETE /api/admin/users/:id -> Purge an account permanently
+// Delete User
 exports.deleteUser = asyncHandler(async (req, res) => {
   await userService.removeUserRecord(req.params.id);
-  res.json({ success: true, message: "User profile purged successfully" });
+  // Delete user
+
+  res.json({
+    success: true,
+    message: "User deleted",
+  });
+  // Send response
 });

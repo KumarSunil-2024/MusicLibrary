@@ -1,10 +1,12 @@
 const express = require("express");
+// Import Express
+
 const router = express.Router();
+// Create router
 
-// Import the security token protection middleware layer
 const { protect } = require("../middleware/authMiddleware");
+// Import token check
 
-// Import the specific playlist handling controller methods
 const {
   createPlaylist,
   getPlaylists,
@@ -15,43 +17,39 @@ const {
   getAllSongs,
   addItunesSong,
 } = require("../controllers/playlistController");
+// Import playlist functions
 
-/* ==========================================================================
-   1. CORE PLAYLIST CRUD OPERATIONS (Requires a valid login token)
-   ========================================================================== */
-
-// POST /api/playlists -> Instantiate a brand new playlist record
+// POST /api/playlists
 router.post("/", protect, createPlaylist);
+// Create playlist
 
-// GET /api/playlists -> Fetch all custom playlists owned by the active user
+// GET /api/playlists
 router.get("/", protect, getPlaylists);
+// Get all playlists
 
-// PUT /api/playlists/:id -> Modify properties (like renaming) an existing playlist
+// PUT /api/playlists/:id
 router.put("/:id", protect, updatePlaylist);
+// Update playlist
 
-// DELETE /api/playlists/:id -> Drop a playlist row completely from the database
+// DELETE /api/playlists/:id
 router.delete("/:id", protect, deletePlaylist);
+// Delete playlist
 
-
-/* ==========================================================================
-   2. NESTED TRACK INTEGRATION CONTROLS (Alters items inside a playlist)
-   ========================================================================== */
-
-// PUT /api/playlists/:id/add-song -> Append a local database track into a playlist
+// PUT /api/playlists/:id/add-song
 router.put("/:id/add-song", protect, addSong);
+// Add local song
 
-// PUT /api/playlists/:id/add-itunes-song -> Append store song item
+// PUT /api/playlists/:id/add-itunes-song
 router.put("/:id/add-itunes-song", protect, addItunesSong);
+// Add iTunes song
 
-// PUT /api/playlists/:id/remove-song/:songId -> Detach a song from a playlist registry
+// PUT /api/playlists/:id/remove-song/:songId
 router.put("/:id/remove-song/:songId", protect, removeSong);
+// Remove song
 
-
-/* ==========================================================================
-   3. CATALOG DISCOVERY SEARCH ROUTE
-   ========================================================================== */
-
-// GET /api/playlists/songs/all -> Fetch accessible public library songs to add
+// GET /api/playlists/songs/all
 router.get("/songs/all", protect, getAllSongs);
+// Get all songs
 
 module.exports = router;
+// Export router

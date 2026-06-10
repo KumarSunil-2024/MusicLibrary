@@ -1,34 +1,34 @@
 const express = require("express");
+// Import Express framework
+
 const router = express.Router();
+// Create route object
 
-// Import authentication and authorization middleware layers
 const { protect, admin } = require("../middleware/authMiddleware");
+// Import security checks
 
-// Import the complete admin controller module object
 const adminController = require("../controllers/adminController");
+// Import admin functions
 
-/* ==========================================================================
-   1. ADMINISTRATIVE USER ACCOUNT REGISTRY MANAGEMENT
-   ========================================================================== */
-
-// GET /api/admin/users -> Fetch full list of profiles (Excludes passwords)
+// GET /api/admin/users
 router.get("/users", protect, admin, adminController.getUsers);
+// Get all users
 
-// GET /api/admin/users/:id -> Read a specific profile entity details
+// GET /api/admin/users/:id
 router.get("/users/:id", protect, admin, adminController.getUser);
+// Get single user
 
-// PUT /api/admin/users/:id -> Modify an account profile node properties
+// PUT /api/admin/users/:id
 router.put("/users/:id", protect, admin, adminController.updateUser);
+// Update user details
 
-// DELETE /api/admin/users/:id -> Purge an account permanently from the registry
+// DELETE /api/admin/users/:id
 router.delete("/users/:id", protect, admin, adminController.deleteUser);
+// Delete user account
 
-
-/* ==========================================================================
-   2. SYSTEM CATALOG & BROADCAST OPERATIONS
-   ========================================================================== */
-
-// POST /api/admin/songs -> Inject a brand new song and broadcast real-time socket alerts
+// POST /api/admin/songs
 router.post("/songs", protect, admin, adminController.adminAddSong);
+// Add new song
 
 module.exports = router;
+// Export router object

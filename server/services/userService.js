@@ -1,73 +1,132 @@
 const User = require("../models/User");
+// Import User model
 
 class UserService {
-  // 1. MASTER READ: Fetches all users (Excludes sensitive password hashes)
+  // User service class
+
   async getAllUsersMaster() {
+    // Get all users
+
     return await User.find().select("-password");
+    // Exclude password
   }
 
-  // 2. SINGLE PROFILE READ: Fetches user details by explicit ID
   async getUserDetailsById(id) {
-    if (!id) throw new Error("User identifier required");
-    
-    const user = await User.findById(id).select("-password");
-    if (!user) throw new Error("User Not Found");
-    return user;
-  }
+    // Get user details
 
-  // 3. ADMIN MUTATION ACTION: Allows administrators to modify full profile nodes
-  async adminModifyUser(id, payload) {
-    if (!id || !payload) {
-      throw new Error("Missing profile identifier or modification data");
+    if (!id) {
+      // Check user ID
+      throw new Error("User identifier required");
     }
 
-    // Explicitly parse incoming attributes to prevent unintended updates
+    const user = await User.findById(id).select("-password");
+    // Find user
+
+    if (!user) {
+      // User not found
+      throw new Error("User Not Found");
+    }
+
+    return user;
+    // Return user data
+  }
+
+  async adminModifyUser(id, payload) {
+    // Update user
+
+    if (!id || !payload) {
+      // Check inputs
+      throw new Error("Missing data");
+    }
+
     const updatedFields = {
       name: payload.name,
-      email: payload.email || payload.emailId, // Fixed field assignment mapping logic
+      email: payload.email || payload.emailId,
       phone: payload.phone,
-      role: payload.role ? payload.role.toUpperCase() : "USER" // Normalizes string case
+      role: payload.role ? payload.role.toUpperCase() : "USER",
     };
+    // Prepare update data
 
     const updated = await User.findByIdAndUpdate(
       id,
-      { $set: updatedFields },
-      { new: true, runValidators: true } // Runs validation guards on parameters
+      {
+        $set: updatedFields,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
     ).select("-password");
-    
-    if (!updated) throw new Error("User Not Found");
+    // Update user
+
+    if (!updated) {
+      // User not found
+      throw new Error("User Not Found");
+    }
+
     return updated;
+    // Return updated user
   }
 
-  // 4. PURGE DROP: Drops an account record permanently from the database
   async removeUserRecord(id) {
-    if (!id) throw new Error("User identifier required");
+    // Delete user
+
+    if (!id) {
+      // Check user ID
+      throw new Error("User identifier required");
+    }
 
     const deleted = await User.findByIdAndDelete(id);
-    if (!deleted) throw new Error("User Not Found");
+    // Delete user
+
+    if (!deleted) {
+      // User not found
+      throw new Error("User Not Found");
+    }
+
     return true;
+    // Success response
   }
 
-  // 5. CLIENT SELF-MUTATION: Handles individual self-profile updates
   async mutateSelfProfile(id, name, phone) {
-    if (!id) throw new Error("User identifier required");
+    // Update own profile
+
+    if (!id) {
+      // Check user ID
+      throw new Error("User identifier required");
+    }
 
     const user = await User.findById(id);
-    if (!user) throw new Error("User Not Found");
+    // Find user
 
-    // Conditionally re-assign updated attributes
-    if (name) user.name = name.trim();
-    if (phone) user.phone = phone.trim();
+    if (!user) {
+      // User not found
+      throw new Error("User Not Found");
+    }
+
+    if (name) {
+      // Update name
+      user.name = name.trim();
+    }
+
+    if (phone) {
+      // Update phone
+      user.phone = phone.trim();
+    }
 
     const savedUser = await user.save();
-    
-    // Convert object to strip password hash from being sent back to client layout
+    // Save changes
+
     const userObject = savedUser.toObject();
+    // Convert object
+
     delete userObject.password;
-    
+    // Remove password
+
     return userObject;
+    // Return user data
   }
 }
 
-// Export a single initialized instance of the service class
 module.exports = new UserService();
+// Export service

@@ -1,10 +1,12 @@
 const express = require("express");
+// Import Express
+
 const router = express.Router();
+// Create router
 
-// Import the security token protection middleware layer
 const { protect } = require("../middleware/authMiddleware");
+// Import token check
 
-// Import target authentication controller business logic
 const {
   register,
   login,
@@ -12,40 +14,36 @@ const {
   updateProfile,
   deleteProfile,
 } = require("../controllers/authController");
+// Import controller functions
 
-/* ==========================================================================
-   1. DIAGNOSTIC API HEARTBEAT
-   ========================================================================== */
-
-// GET /api/auth -> Simple network verification diagnostic health check
+// GET /api/auth
 router.get("/", (req, res) => {
   res.json({
     success: true,
     message: "Auth API Gateway Operational",
   });
 });
+// API health check
 
-/* ==========================================================================
-   2. PUBLIC AUTHCESS GATEWAYS (Open to unauthenticated traffic)
-   ========================================================================== */
-
-// POST /api/auth/register -> Process entry details and commit new account records
+// POST /api/auth/register
 router.post("/register", register);
+// Create new account
 
-// POST /api/auth/login -> Verify login credentials and exchange for signed JWT session
+// POST /api/auth/login
 router.post("/login", login);
+// User login
 
-/* ==========================================================================
-   3. PRIVATE PROFILE SUITE (Requires a valid login token verification)
-   ========================================================================== */
-
-// GET /api/auth/profile -> Fetch logged-in user profile details
+// GET /api/auth/profile
 router.get("/profile", protect, getProfile);
+// View own profile
 
-// PUT /api/auth/profile -> Modify properties on the current user identity node
+// PUT /api/auth/profile
 router.put("/profile", protect, updateProfile);
+// Update profile
 
-// DELETE /api/auth/profile -> Permanently purge the active profile registry context
+// DELETE /api/auth/profile
 router.delete("/profile", protect, deleteProfile);
+// Delete profile
 
 module.exports = router;
+// Export routes

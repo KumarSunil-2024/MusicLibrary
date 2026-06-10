@@ -1,114 +1,153 @@
-// Import database models using CommonJS syntax
 const Playlist = require("../models/Playlist");
+// Import Playlist model
+
 const Song = require("../models/Song");
+// Import Song model
 
 class PlaylistService {
-  // 1. RETRIEVE USER COLLECTIONS: Fetches lists and hydrates nested track objects
+  // Playlist service class
+
   async getUserPlaylists(userId) {
-    if (!userId) throw new Error("User identifier required");
+    // Get user playlists
+
+    if (!userId) {
+      // Check user ID
+      throw new Error("User identifier required");
+    }
+
     return await Playlist.find({ userId }).populate("songs");
+    // Fetch playlists
   }
 
-  // 2. CREATE PLAYLIST
   async createNewPlaylist(name, userId) {
+    // Create playlist
+
     if (!name?.trim() || !userId) {
+      // Validate inputs
       throw new Error("Playlist title and user identifier are required");
     }
-    return await Playlist.create({ name: name.trim(), userId });
+
+    return await Playlist.create({
+      name: name.trim(),
+      userId,
+    });
+    // Save playlist
   }
 
-  // 3. REMOVE PLAYLIST
   async removePlaylistById(id) {
-    if (!id) throw new Error("Playlist ID required");
+    // Delete playlist
+
+    if (!id) {
+      // Check playlist ID
+      throw new Error("Playlist ID required");
+    }
+
     const deleted = await Playlist.findByIdAndDelete(id);
-    if (!deleted) throw new Error("Playlist Not Found");
+    // Delete from database
+
+    if (!deleted) {
+      // Playlist not found
+      throw new Error("Playlist Not Found");
+    }
+
     return deleted;
+    // Return deleted playlist
   }
 
-  // 4. APPEND SONG TO COLLECTION: Standardizes object formats before insertion
   async pushSongToCollection(playlistId, songId) {
+    // Add song to playlist
+
     if (!playlistId || !songId) {
+      // Validate IDs
       throw new Error("Playlist ID and Song ID are required");
     }
 
     const song = await Song.findById(songId);
+    // Find song
+
     if (!song) {
+      // Song not found
       throw new Error("Song not found");
     }
 
-    // Fallback logic for unique song mapping keys
-    const trackNum = Number(song.trackId) || Math.floor(100000 + Math.random() * 900000);
-    
     const payload = {
-      _id: song._id, // Retain original document ID reference
-      trackId: trackNum,
-      trackName: song.songName || song.songTitle || "Untitled Track",
-      artistName: song.singer || "Unknown Artist",
-      albumName: song.albumName || s.albumTitle || "Single",
-      artworkUrl: song.image || "/default-music.png",
+      // Create song object
+      _id: song._id,
+      trackId: Number(song.trackId),
+      trackName: song.songName,
+      artistName: song.singer,
+      albumName: song.albumName,
+      artworkUrl: song.image,
       previewUrl: song.songUrl,
-      releaseDate: song.createdAt ? song.createdAt.toISOString() : new Date().toISOString(),
-      genre: song.genre || "General",
     };
 
     const updated = await Playlist.findByIdAndUpdate(
       playlistId,
-      { $push: { songs: payload } },
-      { returnDocument: "after", runValidators: true }
+      {
+        $push: {
+          songs: payload,
+        },
+      },
+      {
+        returnDocument: "after",
+      }
     );
+    // Add song
 
-    if (!updated) {
-      throw new Error("Playlist Not Found");
-    }
     return updated;
+    // Return updated playlist
   }
 
-  // 5. DETACH SONG FROM COLLECTION: Safely drops subdocument matches
   async pullSongFromCollection(playlistId, songId) {
+    // Remove song
+
     if (!playlistId || !songId) {
+      // Validate IDs
       throw new Error("Playlist ID and Song ID are required");
     }
 
-    // Cleaned up the query block to ensure stable array matching
     const updated = await Playlist.findByIdAndUpdate(
       playlistId,
       {
         $pull: {
           songs: {
-            $or: [
-              { _id: songId },
-              { trackId: Number(songId) || 0 }
-            ]
-          }
-        }
+            _id: songId,
+          },
+        },
       },
-      { returnDocument: "after" }
+      {
+        returnDocument: "after",
+      }
     );
+    // Remove song
 
-    if (!updated) {
-      throw new Error("Playlist Not Found");
-    }
     return updated;
+    // Return playlist
   }
 
-  // 6. RENAME PLAYLIST
   async updatePlaylistTitle(id, newName) {
+    // Rename playlist
+
     if (!id || !newName?.trim()) {
-      throw new Error("Playlist ID and new title name are required");
+      // Validate data
+      throw new Error("Playlist ID and title required");
     }
 
     const updated = await Playlist.findByIdAndUpdate(
       id,
-      { name: newName.trim() },
-      { returnDocument: "after", runValidators: true }
+      {
+        name: newName.trim(),
+      },
+      {
+        returnDocument: "after",
+      }
     );
+    // Update playlist name
 
-    if (!updated) {
-      throw new Error("Playlist Not Found");
-    }
     return updated;
+    // Return updated playlist
   }
 }
 
-// Export a single initialized instance of the service class
 module.exports = new PlaylistService();
+// Export service instance
