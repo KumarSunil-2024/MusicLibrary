@@ -1,7 +1,7 @@
 import React from "react";
 
 function SidebarSongs({ songs, currentSong, playSong }) {
-  // If there are no songs, return a clean empty state message
+  // EMPTY SONGS LIST GUARD
   if (!songs || songs.length === 0) {
     return (
       <div className="text-center text-muted p-3" style={{ fontSize: "0.85rem" }}>
@@ -11,9 +11,10 @@ function SidebarSongs({ songs, currentSong, playSong }) {
   }
 
   return (
+    // MAIN SIDEBAR WRAPPER CONTAINER
     <div className="sidebar-songs-wrapper d-flex flex-column gap-1">
       {songs.map((song, index) => {
-        // Simple track match check
+        // ACTIVE ITEM STATE VERIFICATION
         const isActive = currentSong?.trackId === song.trackId;
         
         return (
@@ -25,7 +26,7 @@ function SidebarSongs({ songs, currentSong, playSong }) {
             }`}
             style={{ cursor: "pointer", minWidth: 0 }}
           >
-            {/* 1. IMAGE CONTAINER */}
+            {/* TRACK ARTWORK ALBUM IMAGE */}
             <div className="position-relative flex-shrink-0 me-2">
               <img
                 src={song.artworkUrl60 || song.artworkUrl100}
@@ -34,6 +35,7 @@ function SidebarSongs({ songs, currentSong, playSong }) {
                 height="40"
                 className="rounded-2 object-fit-cover"
               />
+              {/* CONDITIONALLY RENDER AUDIO ICON */}
               {isActive && (
                 <div 
                   className="position-absolute top-0 start-0 w-100 h-100 rounded-2 d-flex align-items-center justify-content-center"
@@ -44,14 +46,16 @@ function SidebarSongs({ songs, currentSong, playSong }) {
               )}
             </div>
 
-            {/* 2. TEXT INFO (Fully Responsive & Overflow Guarded) */}
+            {/* TRACK METADATA DETAILS TEXT */}
             <div className="flex-grow-1 min-w-0">
+              {/* TRUNCATED SONG TITLE HEADER */}
               <p 
                 className={`fw-semibold text-truncate mb-0 ${isActive ? "text-success" : ""}`}
                 style={{ fontSize: "0.8rem", lineHeight: "1.2" }}
               >
                 {song.trackName}
               </p>
+              {/* TRUNCATED ARTIST SUBTITLE TEXT */}
               <p 
                 className="text-muted text-truncate mb-0" 
                 style={{ fontSize: "0.7rem", marginTop: "2px" }}

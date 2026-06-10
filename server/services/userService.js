@@ -1,43 +1,38 @@
 const User = require("../models/User");
-// Import User model
+// IMPORT USER MODEL
 
 class UserService {
-  // User service class
-
+  // PULL MASTER PROFILE REGISTRY
   async getAllUsersMaster() {
-    // Get all users
-
     return await User.find().select("-password");
-    // Exclude password
+    // EXCLUDE PASSWORD FIELD
   }
 
+  // PULL TARGET PROFILE DETAILS
   async getUserDetailsById(id) {
-    // Get user details
-
     if (!id) {
-      // Check user ID
       throw new Error("User identifier required");
     }
+    // CHECK IDENTIFIER EXISTENCE
 
     const user = await User.findById(id).select("-password");
-    // Find user
+    // QUERY PROFILE DATABASE
 
     if (!user) {
-      // User not found
       throw new Error("User Not Found");
     }
+    // EVALUATE DOCUMENT EXISTENCE
 
     return user;
-    // Return user data
+    // RETURN USER RECORD
   }
 
+  // ADMINISTRATIVE DATA MODIFICATION SYSTEM
   async adminModifyUser(id, payload) {
-    // Update user
-
     if (!id || !payload) {
-      // Check inputs
       throw new Error("Missing data");
     }
+    // CHECK INPUT CRITERIA
 
     const updatedFields = {
       name: payload.name,
@@ -45,88 +40,84 @@ class UserService {
       phone: payload.phone,
       role: payload.role ? payload.role.toUpperCase() : "USER",
     };
-    // Prepare update data
+    // ASSIGN METADATA ATTRIBUTES
 
     const updated = await User.findByIdAndUpdate(
       id,
-      {
-        $set: updatedFields,
-      },
+      { $set: updatedFields },
       {
         new: true,
         runValidators: true,
-      },
+      }
     ).select("-password");
-    // Update user
+    // EXECUTE ATOMIC MODIFICATION
 
     if (!updated) {
-      // User not found
       throw new Error("User Not Found");
     }
+    // EVALUATE DATABASE TRANSITION
 
     return updated;
-    // Return updated user
+    // RETURN UPDATED ACCOUNT
   }
 
+  // PURGE PROFILE REGISTRY RECORD
   async removeUserRecord(id) {
-    // Delete user
-
     if (!id) {
-      // Check user ID
       throw new Error("User identifier required");
     }
+    // CHECK IDENTIFIER TARGET
 
     const deleted = await User.findByIdAndDelete(id);
-    // Delete user
+    // REMOVE DATABASE DOCUMENT
 
     if (!deleted) {
-      // User not found
       throw new Error("User Not Found");
     }
+    // VERIFY MUTATION SUCCESS
 
     return true;
-    // Success response
+    // RETURN CONFIRMATION FLAG
   }
 
+  // CLIENT OWNS ACCOUNT EDITING
   async mutateSelfProfile(id, name, phone) {
-    // Update own profile
-
     if (!id) {
-      // Check user ID
       throw new Error("User identifier required");
     }
+    // CHECK SECURITY REFERENCE
 
     const user = await User.findById(id);
-    // Find user
+    // QUERY TARGET DOCUMENT
 
     if (!user) {
-      // User not found
       throw new Error("User Not Found");
     }
+    // VERIFY PROFILE IDENTITY
 
     if (name) {
-      // Update name
       user.name = name.trim();
     }
+    // SANITIZE USER NAME
 
     if (phone) {
-      // Update phone
       user.phone = phone.trim();
     }
+    // SANITIZE PHONE NUMBER
 
     const savedUser = await user.save();
-    // Save changes
+    // COMMIT LOCAL REVISIONS
 
     const userObject = savedUser.toObject();
-    // Convert object
+    // MAP OBJECT REFERENCE
 
     delete userObject.password;
-    // Remove password
+    // DROP PASSWORD HASH
 
     return userObject;
-    // Return user data
+    // RETURN SANITIZED MODEL
   }
 }
 
 module.exports = new UserService();
-// Export service
+// EXPORT USER SERVICE

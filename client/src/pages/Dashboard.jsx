@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Dashboard() {
+  // ROUTING ROUTE NAVIGATION INSTANCE
   const navigate = useNavigate();
+  
+  // LOGGED SYSTEM USER STATE
   const [user, setUser] = useState(null);
 
-  // 1. SAFE IDENTITY READ (Runs once on mount)
+  // READ LOCAL STORAGE INITIALIZATION
   useEffect(() => {
     const userString = localStorage.getItem("user");
     if (userString) {
@@ -17,9 +20,10 @@ function Dashboard() {
     }
   }, []);
 
+  // CURRENT RECIPIENT ADMINISTRATIVE CHECK
   const isAdmin = user?.role === "ADMIN";
 
-  // Reusable card structure for clean rendering
+  // NAVIGATION HUB CARDS ARRAY
   const navigationCards = [
     {
       icon: "🎵",
@@ -50,7 +54,7 @@ function Dashboard() {
   return (
     <div className="container py-4" style={{ color: "#2c3e50" }}>
       
-      {/* 2. TOP BANNER WELCOME ROW - Fully Responsive */}
+      {/* HEADER BANNER USER GREETING */}
       <div 
         className="p-4 mb-4 border shadow-sm d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3" 
         style={{ backgroundColor: "#f8fafc", borderRadius: "12px" }}
@@ -62,6 +66,7 @@ function Dashboard() {
           <h2 className="fw-bold text-dark m-0 mt-1">Hello, {user?.name || "Music Lover"}! 👋</h2>
         </div>
         <div>
+          {/* USER ACCESS LEVEL BADGE */}
           <span 
             className={`badge border px-3 py-2 fw-semibold ${
               isAdmin ? "bg-danger-subtle text-danger border-danger-subtle" : "bg-light text-secondary border"
@@ -73,7 +78,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* 3. MAIN CARDS SYSTEM - Grid splits to columns on desktop */}
+      {/* RENDER GRID INTERACTIVE CARDS */}
       <div className="row g-3">
         {navigationCards.map((card, idx) => (
           <div key={idx} className="col-12 col-md-6 col-lg-4">
@@ -89,6 +94,7 @@ function Dashboard() {
                   <h5 className="fw-bold text-dark mb-1">{card.title}</h5>
                   <p className="text-muted m-0" style={{ fontSize: "0.8rem", lineHeight: "1.4" }}>{card.desc}</p>
                 </div>
+                {/* APPLICATION DEEP ROUTING LINK */}
                 <Link to={card.link} className={`btn btn-sm ${card.colorClass} w-100 mt-3 fw-bold py-2`} style={{ borderRadius: "6px" }}>
                   {card.btnText}
                 </Link>
@@ -98,7 +104,7 @@ function Dashboard() {
         ))}
       </div>
 
-      {/* 4. CONDITIONAL ADMIN MANAGEMENT LAYOUT */}
+      {/* RENDER CONDITIONAL ADMIN WORKSPACE */}
       {isAdmin && (
         <div className="mt-4 pt-3 border-top">
           <div className="d-flex align-items-center gap-2 mb-3">
@@ -107,7 +113,7 @@ function Dashboard() {
           </div>
           
           <div className="row g-3">
-            {/* Control Sub-Card 1 */}
+            {/* CONTROL CONSOLE SUB CARD */}
             <div className="col-12 col-md-6">
               <div className="card border-0 p-3 text-white shadow-sm d-flex flex-column justify-content-between h-100" style={{ backgroundColor: "#1e293b", borderRadius: "10px" }}>
                 <div>
@@ -122,7 +128,7 @@ function Dashboard() {
               </div>
             </div>
 
-            {/* Control Sub-Card 2 */}
+            {/* CATALOG MANAGEMENT SUB CARD */}
             <div className="col-12 col-md-6">
               <div className="card border-0 p-3 text-white shadow-sm d-flex flex-column justify-content-between h-100" style={{ backgroundColor: "#1e293b", borderRadius: "10px" }}>
                 <div>

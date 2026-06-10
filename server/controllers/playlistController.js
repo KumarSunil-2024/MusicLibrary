@@ -1,6 +1,7 @@
 const playlistService = require("../services/playlistService");
 const songService = require("../services/songService");
 
+// ASYNC WRAPPER ERROR CATCHER
 const asyncHandler = (fn) => (req, res, next) => {
   fn(req, res, next).catch((err) => {
     console.error("🚨 Controller caught an unhandled service error:", err.message);
@@ -11,13 +12,13 @@ const asyncHandler = (fn) => (req, res, next) => {
   });
 };
 
-// Get Playlists
+// GET USER PLAYLISTS MIDDLEWARE
 exports.getPlaylists = asyncHandler(async (req, res) => {
   const playlists = await playlistService.getUserPlaylists(req.user.id);
   res.json(playlists);
 });
 
-// Create Playlist
+// CREATE PLAYLIST RECORD MIDDLEWARE
 exports.createPlaylist = asyncHandler(async (req, res) => {
   const playlist = await playlistService.createNewPlaylist(
     req.body.name,
@@ -26,7 +27,7 @@ exports.createPlaylist = asyncHandler(async (req, res) => {
   res.status(201).json(playlist);
 });
 
-// Update Playlist
+// UPDATE PLAYLIST TITLE MIDDLEWARE
 exports.updatePlaylist = asyncHandler(async (req, res) => {
   const updated = await playlistService.updatePlaylistTitle(
     req.params.id,
@@ -35,7 +36,7 @@ exports.updatePlaylist = asyncHandler(async (req, res) => {
   res.json(updated);
 });
 
-// Delete Playlist
+// DELETE PLAYLIST INSTANCE MIDDLEWARE
 exports.deletePlaylist = asyncHandler(async (req, res) => {
   await playlistService.removePlaylistById(req.params.id);
   res.json({
@@ -44,7 +45,7 @@ exports.deletePlaylist = asyncHandler(async (req, res) => {
   });
 });
 
-// Add Local Database Song
+// ADD INTERNAL DATABASE TRACK
 exports.addSong = asyncHandler(async (req, res) => {
   const updated = await playlistService.pushSongToCollection(
     req.params.id,
@@ -53,7 +54,7 @@ exports.addSong = asyncHandler(async (req, res) => {
   res.json(updated);
 });
 
-// Remove Song (Handles both iTunes and Local Database tracks now)
+// REMOVE TRACK FROM SUBCOLLECTION
 exports.removeSong = asyncHandler(async (req, res) => {
   const updated = await playlistService.pullSongFromCollection(
     req.params.id,
@@ -62,26 +63,30 @@ exports.removeSong = asyncHandler(async (req, res) => {
   res.json(updated);
 });
 
-// Add iTunes Song
+// ADD ITUNES METADATA TRACK
 exports.addItunesSong = asyncHandler(async (req, res) => {
+  // NORMALIZING IMAGE KEY FALLBACKS
   const trackArtwork =
     req.body.image ||
     req.body.artworkUrl100 ||
     req.body.artworkUrl ||
     "/default-music.png";
 
+  // NORMALIZING TITLE KEY FALLBACKS
   const nameString =
     req.body.songName ||
     req.body.songTitle ||
     req.body.trackName ||
     "Untitled Track";
 
+  // NORMALIZING ALBUM KEY FALLBACKS
   const albumString =
     req.body.albumName ||
     req.body.albumTitle ||
     req.body.collectionName ||
     "Single";
 
+  // DATA TRANSFER OBJECT CLEANUP
   const normalizedItunesPayload = {
     ...req.body,
     trackName: nameString,
@@ -93,7 +98,6 @@ exports.addItunesSong = asyncHandler(async (req, res) => {
       : new Date().toISOString(),
   };
 
-  // 🎯 FIXED: Directing to pushItunesSongToCollection instead of pushSongToCollection
   const updatedPlaylist = await playlistService.pushItunesSongToCollection(
     req.params.id,
     normalizedItunesPayload
@@ -105,7 +109,7 @@ exports.addItunesSong = asyncHandler(async (req, res) => {
   });
 });
 
-// Get All Songs
+// GET PUBLIC TRACK RECORDS
 exports.getAllSongs = asyncHandler(async (req, res) => {
   const songs = await songService.getVisibleSongs();
   res.json(songs);

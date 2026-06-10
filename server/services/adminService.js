@@ -1,89 +1,79 @@
 const Song = require("../models/Song");
-// Import Song model
+// IMPORT SONG MODEL
 
 const notificationService = require("./notificationService");
-// Import notification service
+// IMPORT NOTIFICATION SERVICE
 
 class AdminService {
-  // Admin service class
-
+  // ADD SONG AND NOTIFY
   async addSongAndNotify(songData, adminId) {
-    // Add new song
-
     if (!songData?.songName || !songData?.songUrl) {
-      // Check required fields
       throw new Error("Missing mandatory track metadata fields");
     }
+    // CHECK REQUIRED METADATA
 
     const song = await Song.create({
       ...songData,
       visibility: true,
     });
-    // Save song
+    // SAVE SONG DOCUMENT
 
     try {
       await notificationService.createSongNotification(song, adminId);
-      // Send notification
     } catch (notificationError) {
-      // Handle notification error
-
       console.error("Notification Error:", notificationError.message);
-      // Log error
     }
+    // TRIGGER BACKGROUND NOTIFICATIONS
 
     return song;
-    // Return song data
+    // RETURN SONG DATA
   }
 
+  // UPDATE LIBRARY TRACK DETAILS
   async updateLibrarySong(id, updateData) {
-    // Update song
-
     if (!id || !updateData) {
-      // Check inputs
       throw new Error("Missing data");
     }
+    // CHECK DATA REQUISITES
 
     const updated = await Song.findByIdAndUpdate(
       id,
-      {
-        $set: updateData,
-      },
+      { $set: updateData },
       {
         returnDocument: "after",
         runValidators: true,
       },
     );
-    // Update database
+    // UPDATE SONG COLLECTION
 
     if (!updated) {
-      // Song not found
       throw new Error("Song Not Found");
     }
+    // VERIFY DATABASE WRITE
 
     return updated;
-    // Return updated song
+    // RETURN UPDATED SONG
   }
 
+  // PURGE TRACK FROM LIBRARY
   async deleteLibrarySong(id) {
-    // Delete song
-
     if (!id) {
-      // Check song ID
       throw new Error("Target record identifier required");
     }
+    // CHECK TRACK ID
 
     const deleted = await Song.findByIdAndDelete(id);
-    // Delete song
+    // REMOVE DOCUMENT INSTANCE
 
     if (!deleted) {
-      // Song not found
       throw new Error("Song Not Found");
     }
+    // VERIFY REMOVAL OPERATION
 
     return deleted;
-    // Return deleted song
+    // RETURN DEL RECORD
   }
 }
 
 module.exports = new AdminService();
-// Export service
+// EXPORT ADMIN SERVICE

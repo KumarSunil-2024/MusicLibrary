@@ -1,13 +1,14 @@
 import React from "react";
 
 function SearchBar({ search, setSearch, suggestions, selectSong }) {
-  // Safe check to avoid rendering errors if suggestions is undefined
+  // VERIFY ACTIVE SUGGESTIONS ARRAY
   const hasSuggestions = suggestions && suggestions.length > 0;
 
   return (
+    // MAIN POSITION RELATIVE CONTAINER
     <div className="mb-3 position-relative">
       
-      {/* SEARCH INPUT FIELD */}
+      {/* GLOBAL TYPING INPUT BOX */}
       <input
         type="text"
         className="form-control form-control-lg shadow-sm fs-6"
@@ -16,28 +17,29 @@ function SearchBar({ search, setSearch, suggestions, selectSong }) {
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {/* FLOATING SUGGESTIONS DROPDOWN PANEL */}
+      {/* RENDER FLOATING PANEL LAYER */}
       {hasSuggestions && (
         <div
           className="list-group position-absolute w-100 shadow border-1"
           style={{
-            zIndex: 1050, // Ensures overlay sits cleanly over all elements
+            zIndex: 1050, 
             maxHeight: "260px",
             overflowY: "auto",
-            top: "100%", // Anchors dropdown directly below the input
+            top: "100%", 
             left: 0
           }}
         >
           {suggestions.map((song, index) => (
+            // INDIVIDUAL SEARCH RESULT ROW
             <button
-              key={song.trackId || index} // Fallback index ensures unique rendering keys
+              key={song.trackId || index} 
               type="button"
               className="list-group-item list-group-item-action p-2"
               onClick={() => selectSong(song)}
             >
               <div className="d-flex align-items-center">
                 
-                {/* TRACK ARTWORK */}
+                {/* TRACK ART ALBUM THUMBNAIL */}
                 <img
                   src={song.artworkUrl60 || song.artworkUrl100 || "https://placehold.co/40"}
                   alt=""
@@ -46,11 +48,13 @@ function SearchBar({ search, setSearch, suggestions, selectSong }) {
                   height="40"
                 />
 
-                {/* TEXT METADATA BLOCK */}
+                {/* TRACK INFORMATION TEXT WRAPPER */}
                 <div className="text-truncate text-start w-100 style-container" style={{ minWidth: 0 }}>
+                  {/* SONG NAME TEXT FIELD */}
                   <p className="mb-0 fw-bold text-dark text-truncate" style={{ fontSize: "0.85rem" }}>
                     {song.trackName || "Untitled Track"}
                   </p>
+                  {/* SINGER ARTIST SUBTEXT FIELD */}
                   <small className="text-muted text-truncate d-block" style={{ fontSize: "0.75rem" }}>
                     🎤 {song.artistName || "Unknown Artist"}
                   </small>

@@ -1,69 +1,72 @@
 const User = require("../models/User");
-// Import User model
+// IMPORT USER MODEL
 
 const bcrypt = require("bcryptjs");
-// Import bcrypt package
+// IMPORT BCRYPT PACKAGE
 
 const jwt = require("jsonwebtoken");
-// Import JWT package
+// IMPORT JWT PACKAGE
 
-// User Registration
+// USER REGISTRATION LOGIC
 const registerUser = async (data) => {
-  if (!data?.email || !data?.password) {
+  // EXTRACT DYNAMIC REQUEST FIELDS
+  const incomingEmail = data?.emailId || data?.email;
+
+  if (!incomingEmail || !data?.password) {
     throw new Error("Missing required registration fields");
   }
-  // Check required fields
+  // CHECK REQUIRED FIELDS
 
   const existingUser = await User.findOne({
-    email: data.email,
+    email: incomingEmail,
   });
-  // Find existing user
+  // FIND EXISTING USER
 
   if (existingUser) {
     throw new Error("User already exists");
   }
-  // Prevent duplicate account
+  // PREVENT DUPLICATE ACCOUNT
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
-  // Hash password
+  // HASH PASSWORD SECURELY
 
   const user = await User.create({
     name: data.name,
-    email: data.email,
+    email: incomingEmail,
     phone: data.phone,
     password: hashedPassword,
     role: data.role ? data.role.toUpperCase() : "USER",
   });
-  // Save user data
+  // SAVE USER DATA
 
   return user;
-  // Return user
+  // RETURN USER OBJECT
 };
 
-// User Login
+// USER LOGIN LOGIC
 const loginUser = async (email, password) => {
   if (!email || !password) {
     throw new Error("Email and password are required");
   }
-  // Check login fields
+  // CHECK LOGIN FIELDS
 
   const user = await User.findOne({
     email,
   });
-  // Find user
+  // FIND USER PROFILE
 
   if (!user) {
     throw new Error("Invalid Email or Password");
   }
-  // User not found
+  // USER NOT FOUND
 
   const isMatch = await bcrypt.compare(password, user.password);
-  // Compare passwords
+  // COMPARE PASSWORD HASHES
 
   if (!isMatch) {
     throw new Error("Invalid Email or Password");
   }
-  // Wrong password
+  // WRONG PASSWORD MATCH
 
   const token = jwt.sign(
     {
@@ -75,17 +78,17 @@ const loginUser = async (email, password) => {
       expiresIn: "1d",
     },
   );
-  // Generate JWT token
+  // GENERATE JWT TOKEN
 
   return {
     token,
     user,
   };
-  // Return login data
+  // RETURN LOGIN DATA
 };
 
 module.exports = {
   registerUser,
   loginUser,
 };
-// Export functions
+// EXPORT AUTH FUNCTIONS

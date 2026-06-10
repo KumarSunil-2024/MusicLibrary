@@ -1,16 +1,13 @@
 const Song = require("../models/Song");
-// Import Song model
+// IMPORT SONG MODEL
 
 class SongService {
-  // Song service class
-
+  // CREATE NEW SONG
   async createNewSong(bodyData) {
-    // Create new song
-
     if (!bodyData) {
-      // Check request data
       throw new Error("No request payload provided");
     }
+    // CHECK REQUEST PAYLOAD
 
     const {
       songName,
@@ -22,13 +19,13 @@ class SongService {
       songUrl,
       image,
     } = bodyData;
-    // Extract song data
+    // EXTRACT PAYLOAD FIELDS
 
     const finalName = (songName || songTitle)?.trim();
-    // Get song name
+    // CLEAN SONG TITLE
 
     const finalAlbum = (albumName || albumTitle)?.trim();
-    // Get album name
+    // CLEAN ALBUM TITLE
 
     if (
       !finalName ||
@@ -37,9 +34,9 @@ class SongService {
       !musicDirector?.trim() ||
       !songUrl?.trim()
     ) {
-      // Validate fields
       throw new Error("All fields required");
     }
+    // VALIDATE REQUIRED FIELDS
 
     return await Song.create({
       songName: finalName,
@@ -51,25 +48,24 @@ class SongService {
       songUrl: songUrl.trim(),
       image: image || "",
     });
-    // Save song
+    // SAVE SONG DOCUMENT
   }
 
+  // UPDATE EXISTING SONG
   async updateSongById(id, updateData) {
-    // Update song
-
     if (!id || !updateData) {
-      // Check inputs
       throw new Error("Missing data");
     }
+    // CHECK INPUT ENTRIES
 
     const data = { ...updateData };
-    // Copy update data
+    // COPY REQ DATA
 
     if (data.songName) data.songTitle = data.songName;
-    // Sync song title
+    // SYNC SONG TITLE
 
     if (data.albumName) data.albumTitle = data.albumName;
-    // Sync album title
+    // SYNC ALBUM TITLE
 
     const updated = await Song.findByIdAndUpdate(
       id,
@@ -79,101 +75,95 @@ class SongService {
         runValidators: true,
       },
     );
-    // Update database
+    // UPDATE DATABASE RECORDS
 
     if (!updated) {
-      // Song not found
       throw new Error("Song Not Found");
     }
+    // VERIFY UPDATE RESULTS
 
     return updated;
-    // Return updated song
+    // RETURN UPDATED SONG
   }
 
+  // FETCH USER SYSTEM CATALOGUE
   async getVisibleSongs() {
-    // Get visible songs
-
     return await Song.find({
       $or: [{ visibility: true }, { visibility: { $exists: false } }],
     }).sort({ createdAt: -1 });
-    // Fetch public songs
+    // FETCH PUBLIC SONGS
   }
 
+  // FETCH MASTER SYSTEM CATALOGUE
   async getAllSongsMaster() {
-    // Get all songs
-
     return await Song.find().sort({
       createdAt: -1,
     });
-    // Fetch all songs
+    // FETCH ALL SONGS
   }
 
+  // PULL SONG METADATA PROFILE
   async getSongDetails(id) {
-    // Get song details
-
     if (!id) {
-      // Check song ID
       throw new Error("Track ID required");
     }
+    // CHECK INPUT TARGET
 
     const song = await Song.findById(id);
-    // Find song
+    // QUERY DOCUMENT IDENTITY
 
     if (!song) {
-      // Song not found
       throw new Error("Song Not Found");
     }
+    // EVALUATE TARGET MATCH
 
     return song;
-    // Return song
+    // RETURN SONG METADATA
   }
 
+  // DELETE CHOSEN CATALOGUE TRACK
   async removeSongFromDb(id) {
-    // Delete song
-
     if (!id) {
-      // Check song ID
       throw new Error("Track ID required");
     }
+    // CHECK TARGET TRACK
 
     const song = await Song.findByIdAndDelete(id);
-    // Delete song
+    // DELETE COLLECTION ITEM
 
     if (!song) {
-      // Song not found
       throw new Error("Song Not Found");
     }
+    // EVALUATE DELETION TARGET
 
     return song;
-    // Return deleted song
+    // RETURN DELETED DOCUMENT
   }
 
+  // TOGGLE WEB VISIBILITY STATUS
   async toggleSongVisibilityState(id) {
-    // Change visibility
-
     if (!id) {
-      // Check song ID
       throw new Error("Track ID required");
     }
+    // CHECK ID EXISTENCE
 
     const song = await Song.findById(id);
-    // Find song
+    // FIND TARGET TRACK
 
     if (!song) {
-      // Song not found
       throw new Error("Song Not Found");
     }
+    // EVALUATE TARGET EXISTS
 
     song.visibility = song.visibility !== false ? false : true;
-    // Toggle visibility
+    // TOGGLE METADATA BOOLEAN
 
     await song.save();
-    // Save changes
+    // SAVE MONGOOSE CHANGES
 
     return song;
-    // Return updated song
   }
 }
 
 module.exports = new SongService();
-// Export service
+// EXPORT SONG SERVICE

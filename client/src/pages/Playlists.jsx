@@ -3,17 +3,19 @@ import MusicPlayer from "../pages/MusicPlayer";
 import api from "../services/api";
 
 function Playlists() {
+  // COMPONENT ACTIVE STORAGE STATES
   const [playlists, setPlaylists] = useState([]);
   const [name, setName] = useState("");
   const [search, setSearch] = useState("");
   const [currentSong, setCurrentSong] = useState(null); 
 
-  // 1. MEMOIZED SANITIZATION FUNCTION (Prevents recreation on every lifecycle pass)
+  // FETCH PLAYLISTS FROM BACKEND
   const fetchPlaylists = useCallback(async () => {
     try {
       const res = await api.get("/playlists");
       const rawData = res.data || [];
 
+      // SANITIZE TRACK KEY MAPPINGS
       const sanitized = rawData.map(playlist => {
         const rawSongs = playlist.songs || [];
         
@@ -38,11 +40,12 @@ function Playlists() {
     }
   }, []);
 
+  // INITIAL COMPONENT RUN MOUNT
   useEffect(() => { 
     fetchPlaylists(); 
   }, [fetchPlaylists]);
 
-  // 2. EXPLICIT API CRUD OPERATIONS
+  // CREATE NEW CUSTOM COLLECTION
   const createPlaylist = async () => {
     if (!name.trim()) return alert("Enter Playlist Name");
     try {
@@ -54,6 +57,7 @@ function Playlists() {
     }
   };
 
+  // RENAME CHOSEN PLAYLIST INSTANCE
   const renamePlaylist = async (id) => {
     const newName = prompt("Enter New Playlist Name");
     if (!newName?.trim()) return;
@@ -65,6 +69,7 @@ function Playlists() {
     }
   };
 
+  // DELETE CUSTOM COLLECTION PERMANENTLY
   const deletePlaylist = async (id) => {
     if (!window.confirm("Are you sure you want to delete this playlist?")) return;
     try {
@@ -75,25 +80,23 @@ function Playlists() {
     }
   };
 
+  // REMOVE TRACK FROM PLAYLIST
   const removeSongFromPlaylist = async (playlistId, songId) => {
     try {
-      // Clear player engine state first if the currently playing song is being deleted
       if (currentSong && (currentSong.trackId === songId || currentSong._id === songId)) {
         setCurrentSong(null); 
       }
-
-      // 🎯 THE FIX: Explicitly send songId inside data payload body alongside url routing
       await api.put(`/playlists/${playlistId}/remove-song/${songId}`, { songId });
-      
       fetchPlaylists();
     } catch (err) {
       console.error("Remove song failed:", err);
     }
   };
 
-  // 3. TRACK INTERACTION QUEUE STRATEGY
+  // MEMOIZE SANITIZED USER SEARCH
   const cleanQuery = useMemo(() => search.toLowerCase().trim(), [search]);
 
+  // FILTER TRACK ENGINE QUEUE
   const filteredQueue = useMemo(() => {
     return playlists.flatMap(p => p.songs).filter(s => 
       s.trackName.toLowerCase().includes(cleanQuery) || 
@@ -101,6 +104,7 @@ function Playlists() {
     );
   }, [playlists, cleanQuery]);
 
+  // SHIFT TRACK INDEX POSITION
   const shiftTrack = (step) => {
     if (!currentSong || filteredQueue.length === 0) return;
     
@@ -115,11 +119,13 @@ function Playlists() {
   return (
     <div className="container py-3" style={{ color: "#2c3e50" }}>
       
+      {/* PLAYLIST SECTION TOP HEADER */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
           <h2 className="fw-bold m-0" style={{ letterSpacing: "-0.5px", color: "#1e3a8a" }}>🎧 My Playlists</h2>
           <small className="text-muted">Manage and filter your musical collections easily.</small>
         </div>
+        {/* PLAYLIST FILTER SEARCH INPUT */}
         <div style={{ maxWidth: "340px", width: "100%" }}>
           <input 
             type="text" 
@@ -132,6 +138,7 @@ function Playlists() {
       </div>
 
       <div className="row g-3">
+        {/* PLAYLIST CREATION BOX CONTAINER */}
         <div className="col-md-4">
           <div className="card p-3 shadow-sm border" style={{ backgroundColor: "#f8fafc", borderRadius: "10px" }}>
             <h6 className="fw-bold mb-2" style={{ color: "#1e3a8a" }}>New Collection</h6>
@@ -148,6 +155,7 @@ function Playlists() {
           </div>
         </div>
 
+        {/* CUSTOM PLAYLISTS LIST DISPLAY */}
         <div className="col-md-8 d-flex flex-column gap-3">
           {playlists.length === 0 ? (
             <div className="text-center py-4 rounded border border-secondary border-dashed bg-light">
@@ -162,6 +170,7 @@ function Playlists() {
               return (
                 <div key={p._id} className="card border shadow-sm" style={{ borderRadius: "10px", overflow: "hidden" }}>
                   
+                  {/* COLLECTION CARD ACTION ACTIONS */}
                   <div className="px-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-light">
                     <div style={{ minWidth: 0 }} className="me-2">
                       <h5 className="fw-bold m-0 d-inline-block text-dark text-truncate align-middle" style={{ maxWidth: "160px" }}>{p.name}</h5>
@@ -173,6 +182,7 @@ function Playlists() {
                     </div>
                   </div>
 
+                  {/* RENDER INDIVIDUAL TRACK ITEMS */}
                   <div className="card-body p-2 bg-white">
                     {localFilteredSongs.length === 0 ? (
                       <p className="text-muted m-0 py-2 text-center" style={{ fontSize: "0.85rem" }}>No matching songs found</p>
@@ -203,6 +213,7 @@ function Playlists() {
                               </div>
                             </div>
                             
+                            {/* REMOVE SONG FROM COLLECTION */}
                             <button 
                               className="btn btn-sm btn-link text-decoration-none text-danger p-0 px-2 flex-shrink-0" 
                               style={{ fontSize: "0.75rem" }} 
@@ -224,6 +235,7 @@ function Playlists() {
             })
           )}
           
+          {/* HOOK TARGET PLAYBACK CONSOLE */}
           <MusicPlayer currentSong={currentSong} nextSong={() => shiftTrack(1)} previousSong={() => shiftTrack(-1)} />
         </div>
       </div>

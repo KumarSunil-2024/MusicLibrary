@@ -2,13 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { Play, Pause, SkipForward, SkipBack, Shuffle, Repeat, Square } from "lucide-react";
 
 function MusicPlayer({ currentSong, nextSong, previousSong }) {
+  // NATIVE AUDIO ELEMENT REFERENCE
   const audioRef = useRef(null);
+  
+  // LOGICAL AUDIO INSTANCE STATES
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [modes, setModes] = useState({ repeat: false, shuffle: false });
 
-  // 1. AUTO-PLAY CONTROLLER (Runs when song changes)
+  // TRACK PLAYBACK CHANGE HANDLER
   useEffect(() => {
     const player = audioRef.current;
     if (player && currentSong?.previewUrl) {
@@ -21,7 +24,7 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
     }
   }, [currentSong]);
 
-  // 2. AUDIO HANDLERS (Straightforward & simple to explain)
+  // TOGGLE PLAY PAUSE STATE
   const togglePlay = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
@@ -32,6 +35,7 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
     setIsPlaying(!isPlaying);
   };
 
+  // STOP SONG RESET TIME
   const stopSong = () => {
     if (!audioRef.current) return;
     audioRef.current.pause();
@@ -40,14 +44,17 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
     setCurrentTime(0);
   };
 
+  // TRACK RUNNING TIME REFRESH
   const handleTimeUpdate = (e) => {
     setCurrentTime(e.target.currentTime);
   };
 
+  // READ AUDIO METADATA LENGTH
   const handleLoadedMetadata = (e) => {
     setDuration(e.target.duration || 0);
   };
 
+  // MANUALLY ADJUST TIMELINE POSITION
   const handleSeek = (e) => {
     const val = Number(e.target.value);
     if (audioRef.current) {
@@ -56,6 +63,7 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
     setCurrentTime(val);
   };
 
+  // TRACK SONG COMPLETION ROUTINE
   const handleSongEnd = () => {
     if (modes.repeat && audioRef.current) {
       audioRef.current.currentTime = 0;
@@ -65,7 +73,7 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
     }
   };
 
-  // Helper function to turn seconds into MM:SS format
+  // FORMAT TIME STRING METRIC
   const formatTime = (time) => {
     if (isNaN(time) || time === null) return "0:00";
     const mins = Math.floor(time / 60);
@@ -73,7 +81,7 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Empty state guard
+  // EMPTY SELECTION FALLBACK GUARD
   if (!currentSong) {
     return (
       <div className="card text-center border p-3 shadow-sm bg-white" style={{ borderRadius: "10px" }}>
@@ -84,7 +92,7 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
 
   return (
     <div className="card border shadow-sm mt-auto bg-white" style={{ borderRadius: "12px" }}>
-      {/* HTML5 Native Audio element wrapper */}
+      {/* NATIVE HTML5 PLAYER ELEMENT */}
       <audio
         ref={audioRef}
         src={currentSong.previewUrl}
@@ -94,10 +102,9 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
       />
 
       <div className="card-body p-3">
-        {/* Responsive layout: row on desktop, column on phone */}
         <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
           
-          {/* TRACK IDENTITY BLOCK */}
+          {/* TRACK METADATA VIEW BLOCK */}
           <div className="d-flex align-items-center gap-2 w-100 w-md-auto justify-content-center justify-content-md-start" style={{ minWidth: "200px" }}>
             <img
               src={currentSong.artworkUrl100 || "https://placehold.co/46"}
@@ -114,10 +121,10 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
             </div>
           </div>
 
-          {/* PLAYER CORE SYSTEM CONTROLS */}
+          {/* MAIN MEDIA CONTROLLER PACK */}
           <div className="d-flex flex-column align-items-center gap-1 flex-grow-1 w-100" style={{ maxWidth: "440px" }}>
             
-            {/* Control Toggles */}
+            {/* INTERACTIVE TOGGLE CONTROLS BAR */}
             <div className="d-flex align-items-center gap-3 mb-1">
               <button className="btn btn-link p-1 border-0 bg-transparent" style={{ color: modes.shuffle ? "#10b981" : "#9ca3af" }} onClick={() => setModes(p => ({ ...p, shuffle: !p.shuffle }))}>
                 <Shuffle size={16} />
@@ -128,7 +135,7 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
               </button>
               
               <button className="btn d-flex align-items-center justify-content-center shadow-sm border-0" style={{ width: "38px", height: "38px", borderRadius: "50%", backgroundColor: "#1e3a8a", color: "#ffffff" }} onClick={togglePlay}>
-                {isPlaying ? <Pause size={16} /> : <Play size={16} className="ms-0.5" />}
+                {isPlaying ? <Pause size={16} /> : <Play size={16} />}
               </button>
               
               <button className="btn btn-link p-1 border-0 bg-transparent text-secondary" onClick={nextSong}>
@@ -144,7 +151,7 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
               </button>
             </div>
 
-            {/* Slider Range Slider Timeline Container */}
+            {/* PROGRESS BAR TIMELINE CONTAINER */}
             <div className="d-flex align-items-center gap-2 w-100">
               <span className="text-muted" style={{ fontSize: "0.7rem", minWidth: "30px", textAlign: "right" }}>
                 {formatTime(currentTime)}
@@ -165,7 +172,7 @@ function MusicPlayer({ currentSong, nextSong, previousSong }) {
 
           </div>
 
-          {/* STREAM QUALITY BADGE */}
+          {/* STREAM QUALITY STATUS BADGE */}
           <div className="d-none d-md-flex align-items-center gap-2 text-secondary" style={{ width: "120px", justifyContent: "flex-end" }}>
             <span className="badge bg-light text-secondary border fw-medium" style={{ fontSize: "0.6rem" }}>HQ STREAM</span>
           </div>

@@ -1,110 +1,84 @@
 const Song = require("../models/Song");
-// Import Song model
+// IMPORT SONG MODEL
 
 const adminService = require("../services/adminService");
-// Import admin service
+// IMPORT ADMIN SERVICE
 
 const userService = require("../services/userService");
-// Import user service
+// IMPORT USER SERVICE
 
+// ASYNC WRAPPER ERROR CATCHER
 const asyncHandler = (fn) => (req, res, next) => {
-  // Handle async errors
-
   fn(req, res, next).catch((err) => {
-    // Catch errors
-
     console.error(err.message);
-    // Print error
-
     res.status(500).json({
       success: false,
       message: err.message,
     });
-    // Send error response
   });
 };
 
-// Add Song
+// ADD NEW library TRACK
 exports.adminAddSong = asyncHandler(async (req, res) => {
   const adminId = req.user?.id || null;
-  // Get admin ID
 
+  // CALLS NOTIFICATION TRIGGER SERVICE
   const song = await adminService.addSongAndNotify(req.body, adminId);
-  // Save song
 
   res.status(201).json({
     success: true,
     message: "Song added successfully",
     song,
   });
-  // Send response
 });
 
-// Update Song
+// UPDATE library TRACK DETAILS
 exports.adminUpdateSong = asyncHandler(async (req, res) => {
   const updatedSong = await adminService.updateLibrarySong(
     req.params.id,
     req.body,
   );
-  // Update song
-
   res.json({
     success: true,
     song: updatedSong,
   });
-  // Return song
 });
 
-// Delete Song
+// DELETE library TRACK COMPLETELY
 exports.adminDeleteSong = asyncHandler(async (req, res) => {
   await adminService.deleteLibrarySong(req.params.id);
-  // Delete song
-
   res.json({
     success: true,
     message: "Song deleted",
   });
-  // Send response
 });
 
-// Get Users
+// FETCH ALL USERS MIDDLEWARE
 exports.getUsers = asyncHandler(async (req, res) => {
   const users = await userService.getAllUsersMaster();
-  // Fetch users
-
   res.json(users);
-  // Return users
 });
 
-// Get Single User
+// FETCH SPECIFIC USER DETAIL
 exports.getUser = asyncHandler(async (req, res) => {
   const user = await userService.getUserDetailsById(req.params.id);
-  // Find user
-
   res.json(user);
-  // Return user
 });
 
-// Update User
+// ADMINISTRATIVELY EDIT USER PROFILE
 exports.updateUser = asyncHandler(async (req, res) => {
   const updatedUser = await userService.adminModifyUser(
     req.params.id,
     req.body,
   );
-  // Update user
-
   res.json(updatedUser);
-  // Return updated user
 });
 
-// Delete User
+// PURGE CHOSEN USER PROFILE
 exports.deleteUser = asyncHandler(async (req, res) => {
   await userService.removeUserRecord(req.params.id);
-  // Delete user
-
   res.json({
     success: true,
     message: "User deleted",
   });
-  // Send response
 });

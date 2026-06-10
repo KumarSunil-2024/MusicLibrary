@@ -6,22 +6,24 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Navbar() {
+  // NAVIGATION AND STYLING HOOKS
   const navigate = useNavigate();
   const theme = useTheme();
   
-  // Checks if the screen size is a phone layout
+  // MOBILE RESPONSIVENESS MEDIA QUERY
   const isMobile = useMediaQuery(theme.breakpoints.down("sm")); 
   
+  // COMPONENT REACT STATE VARIABLES
   const [anchorEl, setAnchorEl] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const isMenuOpen = Boolean(anchorEl);
 
-  // Read user role safely from storage
+  // USER ACCESS ROLE CHECKING
   const userString = localStorage.getItem("user");
   const currentUser = userString ? JSON.parse(userString) : null;
   const isAdmin = currentUser?.role === "ADMIN";
 
-  // Fetch notifications from the database
+  // FETCH OLD NOTIFICATIONS DATABASE
   const fetchNotifications = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -39,42 +41,44 @@ function Navbar() {
     }
   };
 
+  // SOCKET REALTIME LISTENERS MANAGEMENT
   useEffect(() => {
-    // If Admin, don't do anything
     if (isAdmin) return; 
 
-    // 1. Get old data
     fetchNotifications();
 
-    // 2. Open live connection
+    // CONNECT WEBSOCKET SERVER INSTANCE
     const socket = io("http://localhost:5000");
 
+    // RECEIVE NEW SONGS NOTIFICATION
     socket.on("new_song_notification", (incomingAlert) => {
       if (incomingAlert?.message) {
-        // Add new alert to the list
         setNotifications((prevList) => [incomingAlert, ...prevList]);
       }
     });
 
-    // Close connection when leaving page
+    // CLEANUP DISCONNECT WEBSOCKET CONNECTION
     return () => {
       socket.disconnect();
     };
   }, [isAdmin]);
 
+  // TOGGLE NOTIFICATION DROPDOWN MENU
   const handleMenuOpen = (e) => setAnchorEl(e.currentTarget);
   const handleMenuClose = () => setAnchorEl(null);
 
+  // CLEAR LOGGED USER SESSION
   const logout = () => {
-    localStorage.clear(); // Clear storage items
-    navigate("/"); // Go back to login page
+    localStorage.clear(); 
+    navigate("/"); 
   };
 
   return (
+    // HEADER APPLICATION TOP BAR
     <AppBar position="static">
       <Toolbar sx={{ justifyContent: "space-between" }}>
         
-        {/* LEFT SIDE: LOGO & TITLE */}
+        {/* APP BRAND LOGO UI */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <LibraryMusic sx={{ mr: 1 }} />
           <Typography variant="h6" component="div">
@@ -82,14 +86,16 @@ function Navbar() {
           </Typography>
         </Box>
 
-        {/* RIGHT SIDE: CONTROLS */}
+        {/* RIGHT CONTROLS BUTTON GROUP */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {/* NOTIFICATION BADGE BUTTON CLICKABLE */}
           <IconButton color="inherit" onClick={handleMenuOpen}>
             <Badge badgeContent={isAdmin ? 0 : notifications.length} color="error">
               <Notifications />
             </Badge>
           </IconButton>
 
+          {/* APPLICATION USER LOGOUT BUTTON */}
           <Button 
             color="inherit" 
             onClick={logout} 
@@ -99,7 +105,7 @@ function Navbar() {
           </Button>
         </Box>
 
-        {/* DROPDOWN MENU */}
+        {/* DROPDOWN NOTIFICATIONS DISPLAY LIST */}
         <Menu
           anchorEl={anchorEl}
           open={isMenuOpen}
@@ -111,6 +117,7 @@ function Navbar() {
           </Typography>
           <Divider />
           
+          {/* CONDITIONALLY RENDER ALERTS CONTENT */}
           {isAdmin || notifications.length === 0 ? (
             <MenuItem onClick={handleMenuClose} sx={{ color: "gray", py: 2 }}>
               No new songs added.
