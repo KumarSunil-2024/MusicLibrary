@@ -1,9 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const http = require("http"); 
-const { Server } = require("socket.io"); 
+const http = require("http");
+const { Server } = require("socket.io");
 
+// IMPORT SYSTEM APPS ROUTERS
 const authRoutes = require("./routes/authRoutes");
 const songRoutes = require("./routes/songRoutes");
 const playlistRoutes = require("./routes/playlistRoutes");
@@ -12,19 +13,19 @@ const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 
-// 1. Create an HTTP Server wrapper around Express instance
+// WRAP APPS EXPRESS INSTANCE
 const server = http.createServer(app);
 
-// 2. Initialize Socket.io and assign Cross-Origin Resource settings
+// INITIALIZE SYSTEM SOCKET INSTANCE
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", 
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
 
-// 3. Make the socket controller globally accessible across your Service Layers
+// GLOBAL ASSIGN SOCKET INSTANCE
 global.io = io;
 
 app.use(
@@ -39,30 +40,34 @@ app.use(
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// BASE ROOT HEALTH MIDDLEWARE
 app.get("/", (req, res) => {
-  res.json({ success: true, message: "Music Library API Running with Live Sockets" });
+  res.json({
+    success: true,
+    message: "Music Library API Running with Live Sockets",
+  });
 });
 
-// Routes Registration
+// ROUTER SYSTEM REGISTRY CONNECTIONS
 app.use("/api/auth", authRoutes);
 app.use("/api/songs", songRoutes);
 app.use("/api/playlists", playlistRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// Socket Event Listening Bridge
+// BIND SOCKET EVENT CHANNELS
 io.on("connection", (socket) => {
   console.log(`⚡ Live Event Connection Formed: ${socket.id}`);
-  
+
   socket.on("disconnect", () => {
     console.log(`🔌 Client Disconnected from socket stream: ${socket.id}`);
   });
 });
 
-// Wildcard Route Handlers
+// WILDCARD SYSTEM FALLBACK MIDDLEWARE
 app.use((req, res) => {
   res.status(404).json({ success: false, message: "Route Not Found" });
 });
 
-// 🎯 CRITICAL FIX: Export BOTH entities cleanly as an object wrapper (No inline server.listen here!)
 module.exports = { app, server };
+// EXPORT APPLICATION SERVERS

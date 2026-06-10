@@ -1,18 +1,19 @@
 const Notification = require("../models/Notification");
+// IMPORT NOTIFICATION MODEL
 
 class NotificationService {
-  // 1. BROADCAST ALERT: Saves notification record and fires WebSocket stream event
+  
+  // BROADCAST FRESH TRACK ALERT
   async createSongNotification(song, adminId) {
-    // Basic data guard layer
     if (!song?._id || !song?.songName) {
       throw new Error("Missing mandatory song metadata parameters for alert payload");
     }
+    // CHECK REQUIRED METADATA
 
     try {
       const titleText = "New Song Added";
       const messageText = `🎵 New Release: "${song.songName}" by ${song.singer || "Unknown Artist"} is now available!`;
       
-      // Explicitly map inputs to ensure strict schema compliance
       const newNotification = await Notification.create({
         title: titleText,
         message: messageText,
@@ -22,7 +23,7 @@ class NotificationService {
 
       console.log("💾 Notification persisted in database with ID:", newNotification._id);
 
-      // 2. LIVE EMIT PIPELINE (Protected from external stream failures)
+      // WEBSOCKET REAL-TIME DISPATCH PIPELINE
       if (global.io) {
         try {
           global.io.emit("new_song_notification", {
@@ -40,15 +41,19 @@ class NotificationService {
       return newNotification;
     } catch (error) {
       console.error("🚨 Critical database notification write failure:", error.message);
-      throw error; // Re-throw error so parenting services are contextually aware
+      throw error; 
     }
   }
 
-  // 3. FETCH RECENT LOG INDEX: Pulls last 20 public notifications
+  // PULL RECENT NOTIFICATION ENTRIES
   async getAllNotifications() {
-    return await Notification.find().sort({ createdAt: -1 }).limit(20);
+    // FETCH PERSISTENT NOTIFICATION RECORDS
+    return await Notification.find()
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean(); // LEAN SPEEDS UP READ-ONLY EXECUTION
   }
 }
 
-// Export a single initialized instance of the service class
 module.exports = new NotificationService();
+// EXPORT SYSTEM SERVICE

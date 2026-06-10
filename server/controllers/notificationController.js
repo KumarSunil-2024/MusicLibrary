@@ -1,6 +1,7 @@
 const notificationService = require("../services/notificationService");
+// IMPORT NOTIFICATION SERVICE
 
-// Unified Async Error Handler Wrapper
+// ASYNC WRAPPER ERROR CATCHER
 const asyncHandler = (fn) => (req, res, next) => {
   fn(req, res, next).catch((err) => {
     console.error(`🚨 Notification module API error [${req.method} ${req.originalUrl}]:`, err.message);
@@ -8,15 +9,11 @@ const asyncHandler = (fn) => (req, res, next) => {
   });
 };
 
-/* ==========================================================================
-   1. REAL-TIME ALERTS LOG READS
-   ========================================================================== */
-
-// GET /api/notifications -> Exposes an endpoint for client dashboard notification feeds
+// EXPOSE NOTIFICATION FEED API
 exports.getNotifications = asyncHandler(async (req, res) => {
-  // Pull persistent logs from database layer
+  // PULL RECENT HISTORICAL RECORDS
   const notificationsList = await notificationService.getAllNotifications();
   
-  // Return standard array format directly to user feed layouts
-  res.json(notificationsList);
+  // SEND FEED ARRAY DIRECTLY
+  res.json(notificationsList || []);
 });

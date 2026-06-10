@@ -1,80 +1,70 @@
 const jwt = require("jsonwebtoken");
-// Import JWT package
+// IMPORT JWT PACKAGE
 
+// SECURE PROTECT PATHS MIDDLEWARE
 const protect = async (req, res, next) => {
-  // Authentication middleware
-
   const authHeader = req.headers.authorization;
-  // Get token header
 
   if (!authHeader) {
-    // Check token exists
-
+    // FIX: UPDATED STRING TO RESOLVE JEST TEST SUITE FAILURE
     return res.status(401).json({
       success: false,
-      message: "No Token Provided",
+      message: "Access Denied: No Token Provided",
     });
-    // Access denied
   }
 
   try {
     const token = authHeader.startsWith("Bearer ")
       ? authHeader.split(" ")[1]
       : authHeader;
-    // Extract token
+    // EXTRACT TOKEN STRING
 
     if (!token) {
-      // Check token
-
+      // FIX: MATCHES ACCESS DENIED CONSTRAINTS FOR MISSING TOKENS
       return res.status(401).json({
         success: false,
-        message: "Token Missing",
+        message: "Access Denied: Token Missing",
       });
-      // Access denied
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Verify JWT
+    // VERIFY TOKENS HASH
 
     req.user = {
       id: decoded.id || decoded._id,
       role: decoded.role ? decoded.role.toUpperCase() : "USER",
     };
-    // Store user data
+    // ATTACH USER IDENTIFICATION
 
     next();
-    // Go next middleware
+    // CONTINUE NEXT MIDDLEWARE
   } catch (error) {
     console.error(error.message);
-    // Print error
 
     return res.status(401).json({
       success: false,
       message: "Invalid Token",
     });
-    // Authentication failed
+    // REJECT MALFORMED TOKENS
   }
 };
 
+// AUTHORIZE ADMINISTRATIVE PRIVILEGES MIDDLEWARE
 const admin = (req, res, next) => {
-  // Authorization middleware
-
   if (!req.user || req.user.role !== "ADMIN") {
-    // Check admin role
-
     return res.status(403).json({
       success: false,
       message: "Admin Required",
     });
-    // Access denied
   }
+  // CHECK ADMIN ROLE
 
   next();
-  // Allow access
+  // PERMIT DOWNSTREAM EXECUTION
 };
 
 module.exports = {
   protect,
   admin,
 };
-// Export middleware
+// EXPORT SYSTEM MIDDLEWARES
