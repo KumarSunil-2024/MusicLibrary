@@ -362,8 +362,6 @@ Song 4 – Blinding Lights
 
 ---
 
-# Screenshots
-
 ## Backend
 
 1. User Registration API
