@@ -7,7 +7,6 @@ function SearchBar({ search, setSearch, suggestions, selectSong }) {
   return (
     // MAIN POSITION RELATIVE CONTAINER
     <div className="mb-3 position-relative">
-      
       {/* GLOBAL TYPING INPUT BOX */}
       <input
         type="text"
@@ -22,26 +21,29 @@ function SearchBar({ search, setSearch, suggestions, selectSong }) {
         <div
           className="list-group position-absolute w-100 shadow border-1"
           style={{
-            zIndex: 1050, 
+            zIndex: 1050,
             maxHeight: "260px",
             overflowY: "auto",
-            top: "100%", 
-            left: 0
+            top: "100%",
+            left: 0,
           }}
         >
           {suggestions.map((song, index) => (
             // INDIVIDUAL SEARCH RESULT ROW
             <button
-              key={song.trackId || index} 
+              key={song.trackId || index}
               type="button"
               className="list-group-item list-group-item-action p-2"
               onClick={() => selectSong(song)}
             >
               <div className="d-flex align-items-center">
-                
                 {/* TRACK ART ALBUM THUMBNAIL */}
                 <img
-                  src={song.artworkUrl60 || song.artworkUrl100 || "https://placehold.co/40"}
+                  src={
+                    song.artworkUrl60 ||
+                    song.artworkUrl100 ||
+                    "https://placehold.co/40"
+                  }
                   alt=""
                   className="rounded me-2 flex-shrink-0 object-fit-cover"
                   width="40"
@@ -49,17 +51,25 @@ function SearchBar({ search, setSearch, suggestions, selectSong }) {
                 />
 
                 {/* TRACK INFORMATION TEXT WRAPPER */}
-                <div className="text-truncate text-start w-100 style-container" style={{ minWidth: 0 }}>
+                <div
+                  className="text-truncate text-start w-100 style-container"
+                  style={{ minWidth: 0 }}
+                >
                   {/* SONG NAME TEXT FIELD */}
-                  <p className="mb-0 fw-bold text-dark text-truncate" style={{ fontSize: "0.85rem" }}>
+                  <p
+                    className="mb-0 fw-bold text-dark text-truncate"
+                    style={{ fontSize: "0.85rem" }}
+                  >
                     {song.trackName || "Untitled Track"}
                   </p>
                   {/* SINGER ARTIST SUBTEXT FIELD */}
-                  <small className="text-muted text-truncate d-block" style={{ fontSize: "0.75rem" }}>
+                  <small
+                    className="text-muted text-truncate d-block"
+                    style={{ fontSize: "0.75rem" }}
+                  >
                     🎤 {song.artistName || "Unknown Artist"}
                   </small>
                 </div>
-
               </div>
             </button>
           ))}

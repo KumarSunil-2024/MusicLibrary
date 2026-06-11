@@ -1,19 +1,52 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "../style/AdminDashboard.css"; // SYNC EXTRACTED CSS
 
 function AdminDashboard() {
-  // ROUTING ROUTE NAVIGATION INSTANCE
   const navigate = useNavigate();
 
   // DASHBOARD REACT APP STATES
   const [users, setUsers] = useState([]);
   const [songs, setSongs] = useState([]);
   const [adminUser, setAdminUser] = useState(null);
+  const [userSearch, setUserSearch] = useState("");
   const [songSearch, setSongSearch] = useState("");
 
-  // AUTHENTICATION AND ROLE PROTECTION
+  // MEMOIZED FETCH: REGISTERED USERS API
+  const fetchUsers = useCallback(async (signal) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get("/admin/users", {
+        headers: { Authorization: `Bearer ${token}` },
+        signal,
+      });
+      setUsers(res.data || []);
+    } catch (err) {
+      if (err.name !== "CanceledError") {
+        console.error("Failed to load user accounts:", err.message);
+      }
+    }
+  }, []);
+
+  // MEMOIZED FETCH: GLOBAL TRACK LISTING
+  const fetchSongs = useCallback(async (signal) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get("/songs/admin/all", {
+        headers: { Authorization: `Bearer ${token}` },
+        signal,
+      });
+      const songData = res.data?.data || res.data || [];
+      setSongs(songData);
+    } catch (err) {
+      if (err.name !== "CanceledError") {
+        console.error("Failed to pull down track records:", err.message);
+      }
+    }
+  }, []);
+
+  // AUTHENTICATION, ROLE PROTECTION, AND INITIAL DATA DISPATCH
   useEffect(() => {
     const userString = localStorage.getItem("user");
     if (!userString) {
@@ -25,44 +58,44 @@ function AdminDashboard() {
       const parsedUser = JSON.parse(userString);
       if (parsedUser?.role !== "ADMIN") {
         navigate("/dashboard");
-      } else {
-        setAdminUser(parsedUser);
-        fetchUsers();
-        fetchSongs(); 
+        return;
       }
+      
+      setAdminUser(parsedUser);
+      
+      // AbortController clean up handles unmounted components gracefully
+      const controller = new AbortController();
+      fetchUsers(controller.signal);
+      fetchSongs(controller.signal);
+
+      return () => controller.abort();
     } catch (err) {
       console.error("Authentication check failed:", err);
       navigate("/");
     }
-  }, [navigate]);
+  }, [navigate, fetchUsers, fetchSongs]);
 
-  // FETCH REGISTERED USERS API
-  const fetchUsers = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await api.get("/admin/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUsers(res.data || []);
-    } catch (err) {
-      console.error("Failed to load user accounts:", err.message);
-    }
-  };
-
-  // UPDATE USER DATA MODAL
+  // UPDATE USER DATA NODE
   const updateUser = async (id) => {
     const newName = prompt("Enter New Name");
     if (!newName?.trim()) return;
 
     try {
       const token = localStorage.getItem("token");
+      const trimmedName = newName.trim();
+      
       await api.put(
         `/admin/users/${id}`,
-        { name: newName.trim() },
+        { name: trimmedName },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      
       alert("User updated successfully!");
-      fetchUsers();
+      
+      // Optimistic state update to avoid an extra network roundtrip fetch
+      setUsers((prevUsers) =>
+        prevUsers.map((u) => (u._id === id ? { ...u, name: trimmedName } : u))
+      );
     } catch (err) {
       alert("Failed to update user profile.");
     }
@@ -80,40 +113,11 @@ function AdminDashboard() {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert("User removed from registry.");
-      fetchUsers();
+      setUsers((prevUsers) => prevUsers.filter((u) => u._id !== id));
     } catch (err) {
       alert("Operation failed on server node.");
     }
   };
-
-  // PULL GLOBAL TRACK LISTING
-  const fetchSongs = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await api.get("/songs/admin/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const songData = res.data?.data || res.data || [];
-      setSongs(songData);
-    } catch (err) {
-      console.error("Failed to pull down track records:", err.message);
-    }
-  };
-
-  // MULTI ATTRIBUTE ADMIN FILTER
-  const filteredSongs = useMemo(() => {
-    const term = songSearch.toLowerCase().trim();
-    if (!term) return songs;
-
-    // EVALUATE MATCHES ACROSS TRACKS
-    return songs.filter(
-      (song) =>
-        song.songName?.toLowerCase().includes(term) ||
-        song.singer?.toLowerCase().includes(term) ||
-        song.albumName?.toLowerCase().includes(term)
-    );
-  }, [songSearch, songs]);
 
   // TOGGLE SONG WEB VISIBILITY
   const handleToggleVisibility = async (songId) => {
@@ -139,6 +143,34 @@ function AdminDashboard() {
     }
   };
 
+  // HIGH-PERFORMANCE FILTERS (Normalized search targets outside filter iterations)
+  const filteredUsers = useMemo(() => {
+    const term = userSearch.toLowerCase().trim();
+    if (!term) return users;
+
+    return users.filter(
+      (user) =>
+        user.name?.toLowerCase().includes(term) ||
+        user.email?.toLowerCase().includes(term)
+    );
+  }, [userSearch, users]);
+
+  const filteredSongs = useMemo(() => {
+    const term = songSearch.toLowerCase().trim();
+    if (!term) return songs;
+
+    return songs.filter(
+      (song) =>
+        song.songName?.toLowerCase().includes(term) ||
+        song.singer?.toLowerCase().includes(term) ||
+        song.albumName?.toLowerCase().includes(term)
+    );
+  }, [songSearch, songs]);
+
+  // READ-ONLY COMPUTE PERFORMANCE (Derived cleanly from base states)
+  const totalPublicSongs = useMemo(() => songs.filter(s => s.visibility !== false).length, [songs]);
+  const totalHiddenSongs = useMemo(() => songs.length - totalPublicSongs, [songs, totalPublicSongs]);
+
   return (
     <div className="container py-4" style={{ color: "#1e293b", fontFamily: "sans-serif" }}>
       
@@ -146,7 +178,7 @@ function AdminDashboard() {
       <div className="p-4 mb-4 shadow-sm border-0 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 admin-hero-banner">
         <div>
           <h3 className="font-extrabold m-0 d-flex align-items-center gap-2" style={{ letterSpacing: "-0.5px" }}>
-            <span>👑</span> Welcome back , Admin 👋
+            <span>👑</span> Welcome back, Admin 👋
           </h3>
           <p className="m-0 mt-1 text-white-50" style={{ fontSize: "0.875rem" }}>
             Operational Session Authenticated As: <strong className="text-white">{adminUser?.name || "Root Admin"}</strong>
@@ -179,13 +211,13 @@ function AdminDashboard() {
         <div className="col-6 col-md-3">
           <div className="card border-0 shadow-sm p-3 bg-white admin-metric-card">
             <small className="text-uppercase text-muted fw-bold d-block mb-1" style={{ fontSize: "0.65rem", letterSpacing: "1px" }}>Public View</small>
-            <h3 className="font-black m-0 text-info">{songs.filter(s => s.visibility !== false).length} <span style={{ fontSize: "1rem" }}>Online</span></h3>
+            <h3 className="font-black m-0 text-info">{totalPublicSongs} <span style={{ fontSize: "1rem" }}>Online</span></h3>
           </div>
         </div>
         <div className="col-6 col-md-3">
           <div className="card border-0 shadow-sm p-3 bg-white admin-metric-card">
             <small className="text-uppercase text-muted fw-bold d-block mb-1" style={{ fontSize: "0.65rem", letterSpacing: "1px" }}>Hidden View</small>
-            <h3 className="font-black m-0 text-warning">{songs.filter(s => s.visibility === false).length} <span style={{ fontSize: "1rem" }}>Restricted</span></h3>
+            <h3 className="font-black m-0 text-warning">{totalHiddenSongs} <span style={{ fontSize: "1rem" }}>Restricted</span></h3>
           </div>
         </div>
       </div>
@@ -195,18 +227,28 @@ function AdminDashboard() {
         {/* REGISTERED USER MATRIX CARD */}
         <div className="col-12 col-xl-5">
           <div className="card border-0 shadow-sm bg-white admin-board-card">
-            <div className="px-3 py-3 border-bottom bg-light d-flex justify-content-between align-items-center">
+            <div className="px-3 py-3 border-bottom bg-light d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
               <h6 className="fw-bold m-0 text-dark d-flex align-items-center gap-2">
                 <span>👥</span> User Profiles Node
               </h6>
+              <div style={{ maxWidth: "200px", width: "100%" }}>
+                <input
+                  type="text"
+                  className="form-control form-control-sm border shadow-sm px-3"
+                  style={{ borderRadius: "8px", fontSize: "0.8rem" }}
+                  placeholder="Quick lookup profiles..."
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                />
+              </div>
             </div>
 
             <div className="p-2 admin-scroll-box">
-              {users.length === 0 ? (
+              {filteredUsers.length === 0 ? (
                 <div className="text-center py-5 text-muted small">No active system registries available.</div>
               ) : (
                 <div className="d-flex flex-column gap-2">
-                  {users.map((u) => (
+                  {filteredUsers.map((u) => (
                     <div key={u._id} className="d-flex align-items-center justify-content-between p-2 border-0 admin-transition admin-item-hover admin-list-item">
                       <div className="d-flex flex-column" style={{ minWidth: 0 }}>
                         <div className="d-flex align-items-center gap-2">
@@ -245,7 +287,6 @@ function AdminDashboard() {
               <h6 className="fw-bold m-0 text-dark d-flex align-items-center gap-2">
                 <span>🎵</span> Media Catalogue Layer
               </h6>
-              
               <div style={{ maxWidth: "240px", width: "100%" }}>
                 <input
                   type="text"
@@ -291,7 +332,6 @@ function AdminDashboard() {
                       </div>
 
                       <div>
-                        {/* THE OPERATIONS TOGGLE CONTROLLER BUTTON */}
                         <button
                           className={`btn btn-sm px-3 fw-bold shadow-sm admin-transition border-0 ${
                             song.visibility !== false ? "btn-light text-secondary" : "btn-dark text-success"
