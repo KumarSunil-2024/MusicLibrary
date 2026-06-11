@@ -1,0 +1,207 @@
+[{
+  "_id": {
+    "$oid": "6a2a7d907e84f6f183eb0a48"
+  },
+  "name": "Arijit Special",
+  "userId": {
+    "$oid": "6a2a7be87e84f6f183eb0a46"
+  },
+  "songs": [
+    {
+      "trackId": 1781169569227,
+      "trackName": "Kesariya",
+      "artistName": "Arijit Singh",
+      "albumName": "Brahmastra",
+      "artworkUrl": "https://picsum.photos/500/500?random=1",
+      "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      "releaseDate": "2026-06-11T09:19:29.227Z",
+      "genre": "",
+      "_id": {
+        "$oid": "6a2a7da17e84f6f183eb0a49"
+      }
+    },
+    {
+      "trackId": 1781169594497,
+      "trackName": "Apna Bana Le",
+      "artistName": "Arijit Singh",
+      "albumName": "Bhediya",
+      "artworkUrl": "https://picsum.photos/500/500?random=2",
+      "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+      "releaseDate": "2026-06-11T09:19:54.497Z",
+      "genre": "",
+      "_id": {
+        "$oid": "6a2a7dba7e84f6f183eb0a4e"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2026-06-11T09:19:12.052Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-11T09:20:36.145Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2a7e147e84f6f183eb0a78"
+  },
+  "name": "Jubin Special",
+  "userId": {
+    "$oid": "6a2a7be87e84f6f183eb0a46"
+  },
+  "songs": [
+    {
+      "trackId": 1781169697708,
+      "trackName": "Raataan Lambiyan",
+      "artistName": "Jubin Nautiyal",
+      "albumName": "Shershaah",
+      "artworkUrl": "https://picsum.photos/500/500?random=11",
+      "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      "releaseDate": "2026-06-11T09:21:37.708Z",
+      "genre": "",
+      "_id": {
+        "$oid": "6a2a7e217e84f6f183eb0a7f"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2026-06-11T09:21:24.943Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-11T09:21:37.708Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2a7e377e84f6f183eb0a87"
+  },
+  "name": "Justin Bieber",
+  "userId": {
+    "$oid": "6a2a7be87e84f6f183eb0a46"
+  },
+  "songs": [
+    {
+      "trackId": 1781169734037,
+      "trackName": "Stay",
+      "artistName": "Justin Bieber",
+      "albumName": "Justice",
+      "artworkUrl": "https://picsum.photos/500/500?random=109",
+      "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+      "releaseDate": "2026-06-11T09:22:14.037Z",
+      "genre": "",
+      "_id": {
+        "$oid": "6a2a7e467e84f6f183eb0a91"
+      }
+    },
+    {
+      "trackId": 1781169740821,
+      "trackName": "Love Yourself",
+      "artistName": "Justin Bieber",
+      "albumName": "Purpose",
+      "artworkUrl": "https://picsum.photos/500/500?random=110",
+      "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+      "releaseDate": "2026-06-11T09:22:20.821Z",
+      "genre": "",
+      "_id": {
+        "$oid": "6a2a7e4c7e84f6f183eb0a93"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2026-06-11T09:21:59.767Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-11T09:22:20.821Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2a7e977e84f6f183eb0aa0"
+  },
+  "name": "Neha kakkar songs",
+  "userId": {
+    "$oid": "6a2a7bc87e84f6f183eb0a45"
+  },
+  "songs": [
+    {
+      "trackId": 1781169846063,
+      "trackName": "Dil Ko Karaar Aaya",
+      "artistName": "Neha Kakkar",
+      "albumName": "Sukoon",
+      "artworkUrl": "https://picsum.photos/500/500?random=33",
+      "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+      "releaseDate": "2026-06-11T09:24:06.063Z",
+      "genre": "",
+      "_id": {
+        "$oid": "6a2a7eb67e84f6f183eb0aa2"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2026-06-11T09:23:35.121Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-11T09:24:06.063Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2a7ea67e84f6f183eb0aa1"
+  },
+  "name": "Chill Song",
+  "userId": {
+    "$oid": "6a2a7bc87e84f6f183eb0a45"
+  },
+  "songs": [
+    {
+      "trackId": 1781169860495,
+      "trackName": "Believer",
+      "artistName": "Imagine Dragons",
+      "albumName": "Evolve",
+      "artworkUrl": "https://picsum.photos/500/500?random=106",
+      "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+      "releaseDate": "2026-06-11T09:24:20.495Z",
+      "genre": "",
+      "_id": {
+        "$oid": "6a2a7ec47e84f6f183eb0aa4"
+      }
+    },
+    {
+      "trackId": 1781169879629,
+      "trackName": "Shape of You",
+      "artistName": "Ed Sheeran",
+      "albumName": "Divide",
+      "artworkUrl": "https://picsum.photos/500/500?random=101",
+      "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      "releaseDate": "2026-06-11T09:24:39.629Z",
+      "genre": "",
+      "_id": {
+        "$oid": "6a2a7ed77e84f6f183eb0aa6"
+      }
+    },
+    {
+      "trackId": 1781169883713,
+      "trackName": "Someone Like You",
+      "artistName": "Adele",
+      "albumName": "21",
+      "artworkUrl": "https://picsum.photos/500/500?random=104",
+      "previewUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+      "releaseDate": "2026-06-11T09:24:43.713Z",
+      "genre": "",
+      "_id": {
+        "$oid": "6a2a7edb7e84f6f183eb0aa9"
+      }
+    }
+  ],
+  "createdAt": {
+    "$date": "2026-06-11T09:23:50.896Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-11T09:24:43.713Z"
+  },
+  "__v": 0
+}]

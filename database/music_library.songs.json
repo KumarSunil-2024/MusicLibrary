@@ -1,0 +1,785 @@
+[{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1539"
+  },
+  "songName": "Kesariya",
+  "songTitle": "Kesariya (Love Anthem)",
+  "singer": "Arijit Singh",
+  "albumName": "Brahmastra",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  "image": "https://picsum.photos/500/500?random=1",
+  "visibility": true,
+  "updatedAt": {
+    "$date": "2026-06-11T09:40:16.779Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f153a"
+  },
+  "songName": "Apna Bana Le",
+  "songTitle": "Apna Bana Le",
+  "singer": "Arijit Singh",
+  "albumName": "Bhediya",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Sachin-Jigar",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+  "image": "https://picsum.photos/500/500?random=2",
+  "visibility": true,
+  "updatedAt": {
+    "$date": "2026-06-11T09:40:15.537Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f153b"
+  },
+  "songName": "Chaleya",
+  "songTitle": "Chaleya",
+  "singer": "Arijit Singh",
+  "albumName": "Jawan",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Anirudh Ravichander",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+  "image": "https://picsum.photos/500/500?random=3",
+  "visibility": true,
+  "updatedAt": {
+    "$date": "2026-06-11T09:30:03.867Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f153c"
+  },
+  "songName": "O Maahi",
+  "songTitle": "O Maahi",
+  "singer": "Arijit Singh",
+  "albumName": "Dunki",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+  "image": "https://picsum.photos/500/500?random=4",
+  "visibility": true,
+  "updatedAt": {
+    "$date": "2026-06-11T09:30:04.710Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f153d"
+  },
+  "songName": "Satranga",
+  "songTitle": "Satranga",
+  "singer": "Arijit Singh",
+  "albumName": "Animal",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Shreyas Puranik",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+  "image": "https://picsum.photos/500/500?random=5",
+  "visibility": true,
+  "updatedAt": {
+    "$date": "2026-06-11T09:30:05.601Z"
+  }
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f153e"
+  },
+  "songName": "Pehle Bhi Main",
+  "songTitle": "Pehle Bhi Main",
+  "singer": "Vishal Mishra",
+  "albumName": "Animal",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Vishal Mishra",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+  "image": "https://picsum.photos/500/500?random=6",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f153f"
+  },
+  "songName": "Heeriye",
+  "songTitle": "Heeriye",
+  "singer": "Arijit Singh",
+  "albumName": "Heeriye",
+  "albumTitle": "Single",
+  "musicDirector": "Jasleen Royal",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+  "image": "https://picsum.photos/500/500?random=7",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1540"
+  },
+  "songName": "Ve Kamleya",
+  "songTitle": "Ve Kamleya",
+  "singer": "Arijit Singh",
+  "albumName": "Rocky Aur Rani Kii Prem Kahaani",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+  "image": "https://picsum.photos/500/500?random=8",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1541"
+  },
+  "songName": "Tum Kya Mile",
+  "songTitle": "Tum Kya Mile",
+  "singer": "Arijit Singh",
+  "albumName": "Rocky Aur Rani Kii Prem Kahaani",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+  "image": "https://picsum.photos/500/500?random=9",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1542"
+  },
+  "songName": "Ranjha",
+  "songTitle": "Ranjha",
+  "singer": "B Praak",
+  "albumName": "Shershaah",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Jasleen Royal",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+  "image": "https://picsum.photos/500/500?random=10",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1543"
+  },
+  "songName": "Raataan Lambiyan",
+  "songTitle": "Raataan Lambiyan",
+  "singer": "Jubin Nautiyal",
+  "albumName": "Shershaah",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Tanishk Bagchi",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  "image": "https://picsum.photos/500/500?random=11",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1544"
+  },
+  "songName": "Maan Meri Jaan",
+  "songTitle": "Maan Meri Jaan",
+  "singer": "King",
+  "albumName": "Champagne Talk",
+  "albumTitle": "Studio Album",
+  "musicDirector": "King",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+  "image": "https://picsum.photos/500/500?random=12",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1545"
+  },
+  "songName": "Husn",
+  "songTitle": "Husn",
+  "singer": "Anuv Jain",
+  "albumName": "Husn",
+  "albumTitle": "Single",
+  "musicDirector": "Anuv Jain",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+  "image": "https://picsum.photos/500/500?random=13",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1546"
+  },
+  "songName": "Soulmate",
+  "songTitle": "Soulmate",
+  "singer": "Badshah & Arijit Singh",
+  "albumName": "Ek Tha Raja",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Hiten",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+  "image": "https://picsum.photos/500/500?random=14",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1547"
+  },
+  "songName": "Tere Pyaar Mein",
+  "songTitle": "Tere Pyaar Mein",
+  "singer": "Arijit Singh",
+  "albumName": "Tu Jhoothi Main Makkaar",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+  "image": "https://picsum.photos/500/500?random=15",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1548"
+  },
+  "songName": "Dil Diyan Gallan",
+  "songTitle": "Dil Diyan Gallan",
+  "singer": "Atif Aslam",
+  "albumName": "Tiger Zinda Hai",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Vishal-Shekhar",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+  "image": "https://picsum.photos/500/500?random=16",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1549"
+  },
+  "songName": "Kaise Hua",
+  "songTitle": "Kaise Hua",
+  "singer": "Vishal Mishra",
+  "albumName": "Kabir Singh",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Vishal Mishra",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+  "image": "https://picsum.photos/500/500?random=17",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f154a"
+  },
+  "songName": "Bekhayali",
+  "songTitle": "Bekhayali",
+  "singer": "Sachet Tandon",
+  "albumName": "Kabir Singh",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Sachet-Parampara",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+  "image": "https://picsum.photos/500/500?random=18",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f154b"
+  },
+  "songName": "Shayad",
+  "songTitle": "Shayad",
+  "singer": "Arijit Singh",
+  "albumName": "Love Aaj Kal",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+  "image": "https://picsum.photos/500/500?random=19",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f154c"
+  },
+  "songName": "Agar Tum Saath Ho",
+  "songTitle": "Agar Tum Saath Ho",
+  "singer": "Alka Yagnik & Arijit Singh",
+  "albumName": "Tamasha",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "A. R. Rahman",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+  "image": "https://picsum.photos/500/500?random=20",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f154d"
+  },
+  "songName": "Tera Ban Jaunga",
+  "songTitle": "Tera Ban Jaunga",
+  "singer": "Akhil Sachdeva",
+  "albumName": "Kabir Singh",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Akhil Sachdeva",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  "image": "https://picsum.photos/500/500?random=21",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f154e"
+  },
+  "songName": "Mast Magan",
+  "songTitle": "Mast Magan",
+  "singer": "Arijit Singh",
+  "albumName": "2 States",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Shankar-Ehsaan-Loy",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+  "image": "https://picsum.photos/500/500?random=22",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f154f"
+  },
+  "songName": "Janam Janam",
+  "songTitle": "Janam Janam",
+  "singer": "Arijit Singh",
+  "albumName": "Dilwale",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+  "image": "https://picsum.photos/500/500?random=23",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1550"
+  },
+  "songName": "Gerua",
+  "songTitle": "Gerua",
+  "singer": "Arijit Singh",
+  "albumName": "Dilwale",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+  "image": "https://picsum.photos/500/500?random=24",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1551"
+  },
+  "songName": "Tum Hi Ho",
+  "songTitle": "Tum Hi Ho",
+  "singer": "Arijit Singh",
+  "albumName": "Aashiqui 2",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Mithoon",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+  "image": "https://picsum.photos/500/500?random=25",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1552"
+  },
+  "songName": "Sun Raha Hai",
+  "songTitle": "Sun Raha Hai",
+  "singer": "Ankit Tiwari",
+  "albumName": "Aashiqui 2",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Ankit Tiwari",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+  "image": "https://picsum.photos/500/500?random=26",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1553"
+  },
+  "songName": "Raabta",
+  "songTitle": "Raabta",
+  "singer": "Arijit Singh",
+  "albumName": "Agent Vinod",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+  "image": "https://picsum.photos/500/500?random=27",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1554"
+  },
+  "songName": "Khairiyat",
+  "songTitle": "Khairiyat",
+  "singer": "Arijit Singh",
+  "albumName": "Chhichhore",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+  "image": "https://picsum.photos/500/500?random=28",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1555"
+  },
+  "songName": "Phir Le Aya Dil",
+  "songTitle": "Phir Le Aya Dil",
+  "singer": "Arijit Singh",
+  "albumName": "Barfi!",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+  "image": "https://picsum.photos/500/500?random=29",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1556"
+  },
+  "songName": "Ae Dil Hai Mushkil",
+  "songTitle": "Ae Dil Hai Mushkil",
+  "singer": "Arijit Singh",
+  "albumName": "Ae Dil Hai Mushkil",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+  "image": "https://picsum.photos/500/500?random=30",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1557"
+  },
+  "songName": "Channa Mereya",
+  "songTitle": "Channa Mereya",
+  "singer": "Arijit Singh",
+  "albumName": "Ae Dil Hai Mushkil",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  "image": "https://picsum.photos/500/500?random=31",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1558"
+  },
+  "songName": "Tujhe Kitna Chahne Lage",
+  "songTitle": "Tujhe Kitna Chahne Lage",
+  "singer": "Arijit Singh",
+  "albumName": "Kabir Singh",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Mithoon",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+  "image": "https://picsum.photos/500/500?random=32",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1559"
+  },
+  "songName": "Dil Ko Karaar Aaya",
+  "songTitle": "Dil Ko Karaar Aaya",
+  "singer": "Neha Kakkar",
+  "albumName": "Sukoon",
+  "albumTitle": "Single",
+  "musicDirector": "Rajat Nagpal",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+  "image": "https://picsum.photos/500/500?random=33",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f155a"
+  },
+  "songName": "Mann Bharryaa 2.0",
+  "songTitle": "Mann Bharryaa 2.0",
+  "singer": "B Praak",
+  "albumName": "Shershaah",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "B Praak",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+  "image": "https://picsum.photos/500/500?random=34",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f155b"
+  },
+  "songName": "Kaun Tujhe",
+  "songTitle": "Kaun Tujhe",
+  "singer": "Palak Muchhal",
+  "albumName": "M.S. Dhoni",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Amaal Mallik",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+  "image": "https://picsum.photos/500/500?random=35",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f155c"
+  },
+  "songName": "Bol Do Na Zara",
+  "songTitle": "Bol Do Na Zara",
+  "singer": "Armaan Malik",
+  "albumName": "Azhar",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Amaal Mallik",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+  "image": "https://picsum.photos/500/500?random=36",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f155d"
+  },
+  "songName": "Soch Na Sake",
+  "songTitle": "Soch Na Sake",
+  "singer": "Arijit Singh",
+  "albumName": "Airlift",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Amaal Mallik",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+  "image": "https://picsum.photos/500/500?random=37",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f155e"
+  },
+  "songName": "Nazm Nazm",
+  "songTitle": "Nazm Nazm",
+  "singer": "Arko",
+  "albumName": "Bareilly Ki Barfi",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Arko",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+  "image": "https://picsum.photos/500/500?random=38",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f155f"
+  },
+  "songName": "Hawayein",
+  "songTitle": "Hawayein",
+  "singer": "Arijit Singh",
+  "albumName": "Jab Harry Met Sejal",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+  "image": "https://picsum.photos/500/500?random=39",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a796fcc0bae04a51f1560"
+  },
+  "songName": "Ilahi",
+  "songTitle": "Ilahi",
+  "singer": "Arijit Singh",
+  "albumName": "Yeh Jawaani Hai Deewani",
+  "albumTitle": "Original Motion Picture Soundtrack",
+  "musicDirector": "Pritam",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+  "image": "https://picsum.photos/500/500?random=40",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f1562"
+  },
+  "songName": "Shape of You",
+  "songTitle": "Shape of You",
+  "singer": "Ed Sheeran",
+  "albumName": "Divide",
+  "albumTitle": "Deluxe Edition",
+  "musicDirector": "Ed Sheeran",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  "image": "https://picsum.photos/500/500?random=101",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f1563"
+  },
+  "songName": "Blinding Lights",
+  "songTitle": "Blinding Lights",
+  "singer": "The Weeknd",
+  "albumName": "After Hours",
+  "albumTitle": "Studio Album",
+  "musicDirector": "The Weeknd",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+  "image": "https://picsum.photos/500/500?random=102",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f1564"
+  },
+  "songName": "Perfect",
+  "songTitle": "Perfect",
+  "singer": "Ed Sheeran",
+  "albumName": "Divide",
+  "albumTitle": "Deluxe Edition",
+  "musicDirector": "Ed Sheeran",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+  "image": "https://picsum.photos/500/500?random=103",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f1565"
+  },
+  "songName": "Someone Like You",
+  "songTitle": "Someone Like You",
+  "singer": "Adele",
+  "albumName": "21",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Adele",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+  "image": "https://picsum.photos/500/500?random=104",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f1566"
+  },
+  "songName": "Hello",
+  "songTitle": "Hello",
+  "singer": "Adele",
+  "albumName": "25",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Adele",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+  "image": "https://picsum.photos/500/500?random=105",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f1567"
+  },
+  "songName": "Believer",
+  "songTitle": "Believer",
+  "singer": "Imagine Dragons",
+  "albumName": "Evolve",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Imagine Dragons",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+  "image": "https://picsum.photos/500/500?random=106",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f1568"
+  },
+  "songName": "Thunder",
+  "songTitle": "Thunder",
+  "singer": "Imagine Dragons",
+  "albumName": "Evolve",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Imagine Dragons",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+  "image": "https://picsum.photos/500/500?random=107",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f1569"
+  },
+  "songName": "Counting Stars",
+  "songTitle": "Counting Stars",
+  "singer": "OneRepublic",
+  "albumName": "Native",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Ryan Tedder",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+  "image": "https://picsum.photos/500/500?random=108",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f156a"
+  },
+  "songName": "Stay",
+  "songTitle": "Stay",
+  "singer": "Justin Bieber",
+  "albumName": "Justice",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Justin Bieber",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+  "image": "https://picsum.photos/500/500?random=109",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f156b"
+  },
+  "songName": "Love Yourself",
+  "songTitle": "Love Yourself",
+  "singer": "Justin Bieber",
+  "albumName": "Purpose",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Justin Bieber",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3",
+  "image": "https://picsum.photos/500/500?random=110",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f156c"
+  },
+  "songName": "Bad Guy",
+  "songTitle": "Bad Guy",
+  "singer": "Billie Eilish",
+  "albumName": "When We All Fall Asleep",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Finneas",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  "image": "https://picsum.photos/500/500?random=111",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f156d"
+  },
+  "songName": "Lovely",
+  "songTitle": "Lovely",
+  "singer": "Billie Eilish",
+  "albumName": "Singles",
+  "albumTitle": "Single Release",
+  "musicDirector": "Finneas",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+  "image": "https://picsum.photos/500/500?random=112",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f156e"
+  },
+  "songName": "Levitating",
+  "songTitle": "Levitating",
+  "singer": "Dua Lipa",
+  "albumName": "Future Nostalgia",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Dua Lipa",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+  "image": "https://picsum.photos/500/500?random=113",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f156f"
+  },
+  "songName": "New Rules",
+  "songTitle": "New Rules",
+  "singer": "Dua Lipa",
+  "albumName": "Dua Lipa",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Dua Lipa",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+  "image": "https://picsum.photos/500/500?random=114",
+  "visibility": true
+},
+{
+  "_id": {
+    "$oid": "6a2a79bacc0bae04a51f1570"
+  },
+  "songName": "Flowers",
+  "songTitle": "Flowers",
+  "singer": "Miley Cyrus",
+  "albumName": "Endless Summer Vacation",
+  "albumTitle": "Studio Album",
+  "musicDirector": "Miley Cyrus",
+  "songUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+  "image": "https://picsum.photos/500/500?random=115",
+  "visibility": true
+}]

@@ -186,7 +186,7 @@ function AdminDashboard() {
         </div>
         <div className="d-flex flex-wrap gap-2">
           <Link to="/admin/songs" className="btn btn-sm btn-light border-0 shadow-sm fw-bold px-4 py-2" style={{ borderRadius: "8px", color: "#1e1e38" }}>
-            🎯 Management Workspace
+          Admin Control Pannel
           </Link>
           <Link to="/songs" className="btn btn-sm btn-outline-light border-2 fw-bold px-4 py-2" style={{ borderRadius: "8px" }}>
             🎧 Client Deck

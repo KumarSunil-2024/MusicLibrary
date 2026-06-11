@@ -1,0 +1,60 @@
+[{
+  "_id": {
+    "$oid": "6a2a9e1526dbcf3255037f7a"
+  },
+  "title": "New Song Added",
+  "message": "🎵 New Release: \"Blinding Lights\" by The Weeknd is now available!",
+  "songId": {
+    "$oid": "6a2a9e1526dbcf3255037f79"
+  },
+  "createdBy": {
+    "$oid": "6a20103c9dec362ceaf5c794"
+  },
+  "createdAt": {
+    "$date": "2026-06-11T11:37:57.070Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-11T11:37:57.070Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2a9e6826dbcf3255037f7c"
+  },
+  "title": "New Song Added",
+  "message": "🎵 New Release: \"Levitating\" by Dua Lipa is now available!",
+  "songId": {
+    "$oid": "6a2a9e6826dbcf3255037f7b"
+  },
+  "createdBy": {
+    "$oid": "6a20103c9dec362ceaf5c794"
+  },
+  "createdAt": {
+    "$date": "2026-06-11T11:39:20.762Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-11T11:39:20.762Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2a9e9726dbcf3255037f7e"
+  },
+  "title": "New Song Added",
+  "message": "🎵 New Release: \"Believer\" by Imagine Dragons is now available!",
+  "songId": {
+    "$oid": "6a2a9e9726dbcf3255037f7d"
+  },
+  "createdBy": {
+    "$oid": "6a20103c9dec362ceaf5c794"
+  },
+  "createdAt": {
+    "$date": "2026-06-11T11:40:07.462Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-11T11:40:07.462Z"
+  },
+  "__v": 0
+}]

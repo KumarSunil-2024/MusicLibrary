@@ -1,0 +1,131 @@
+[{
+  "_id": {
+    "$oid": "6a20103c9dec362ceaf5c794"
+  },
+  "name": "Admin",
+  "email": "admin@gmail.com",
+  "phone": "9999999999",
+  "password": "$2b$10$ScNxSG1T8DsG2FDOafDTy.6dVQd46TM8xlrjLuAnSAZUAvQNaO0nG",
+  "role": "ADMIN",
+  "createdAt": {
+    "$date": "2026-06-03T11:30:04.884Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-03T11:30:04.884Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2a7bc87e84f6f183eb0a45"
+  },
+  "name": "Rahul Sharma",
+  "email": "rahul.sharma@gmail.com",
+  "phone": "9876543210",
+  "password": "$2b$10$gmVWmlLxYRc1/0yXUyoKy.hFIkRlz46mntGW8pzhFtk9.b15E92F.",
+  "role": "USER",
+  "createdAt": {
+    "$date": "2026-06-11T09:11:36.759Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-11T09:11:36.759Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2a7be87e84f6f183eb0a46"
+  },
+  "name": "Neha Singh",
+  "email": "neha.singh@gmail.com",
+  "phone": "9876543213",
+  "password": "$2b$10$hQ3nU7H8ljKNprkuTxvPNOBePSZThEltLUC3tn/ZmNsQqKnDIsOby",
+  "role": "USER",
+  "createdAt": {
+    "$date": "2026-06-11T09:12:08.137Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-11T09:12:08.137Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a2a7fe8f2d67330843cb424"
+  },
+  "name": "Michael Johnson",
+  "email": "michael.johnson@admin.com",
+  "phone": "2025551001",
+  "password": "$2a$10$BPJrl5MP21neakaOgMkO9.dtpSqA4N4LlWQnJnZr3tVQTJ3YiUTv.",
+  "role": "ADMIN"
+},
+{
+  "_id": {
+    "$oid": "6a2a7fe8f2d67330843cb425"
+  },
+  "name": "Emily Carter",
+  "email": "emily.carter@admin.com",
+  "phone": "2025551002",
+  "password": "$2a$10$BPJrl5MP21neakaOgMkO9.dtpSqA4N4LlWQnJnZr3tVQTJ3YiUTv.",
+  "role": "ADMIN"
+},
+{
+  "_id": {
+    "$oid": "6a2a7fe8f2d67330843cb426"
+  },
+  "name": "William Anderson",
+  "email": "william.anderson@admin.com",
+  "phone": "2025551003",
+  "password": "$2a$10$BPJrl5MP21neakaOgMkO9.dtpSqA4N4LlWQnJnZr3tVQTJ3YiUTv.",
+  "role": "ADMIN"
+},
+{
+  "_id": {
+    "$oid": "6a2a805af2d67330843cb428"
+  },
+  "name": "Anjali Gupta",
+  "email": "anjali.gupta@gmail.com",
+  "phone": "9876543215",
+  "password": "$2b$10$gmVWmlLxYRc1/0yXUyoKy.hFIkRlz46mntGW8pzhFtk9.b15E92F.",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "6a2a805af2d67330843cb429"
+  },
+  "name": "Rohit Verma",
+  "email": "rohit.verma@gmail.com",
+  "phone": "9876543216",
+  "password": "$2b$10$gmVWmlLxYRc1/0yXUyoKy.hFIkRlz46mntGW8pzhFtk9.b15E92F.",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "6a2a805af2d67330843cb42a"
+  },
+  "name": "Sneha Patel",
+  "email": "sneha.patel@gmail.com",
+  "phone": "9876543217",
+  "password": "$2b$10$gmVWmlLxYRc1/0yXUyoKy.hFIkRlz46mntGW8pzhFtk9.b15E92F.",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "6a2a805af2d67330843cb42b"
+  },
+  "name": "Karan Mehta",
+  "email": "karan.mehta@gmail.com",
+  "phone": "9876543218",
+  "password": "$2b$10$gmVWmlLxYRc1/0yXUyoKy.hFIkRlz46mntGW8pzhFtk9.b15E92F.",
+  "role": "USER"
+},
+{
+  "_id": {
+    "$oid": "6a2a805af2d67330843cb42c"
+  },
+  "name": "Pooja Sharma",
+  "email": "pooja.sharma@gmail.com",
+  "phone": "9876543219",
+  "password": "$2b$10$gmVWmlLxYRc1/0yXUyoKy.hFIkRlz46mntGW8pzhFtk9.b15E92F.",
+  "role": "USER"
+}]
