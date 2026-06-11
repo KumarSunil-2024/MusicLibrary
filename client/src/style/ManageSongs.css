@@ -1,0 +1,66 @@
+/* 1. TOP HERO BANNER GRADIENT */
+.config-hero-banner {
+  background: linear-gradient(135deg, #1e1e35 0%, #2a2a55 100%);
+  border-radius: 12px;
+}
+
+/* 2. FORMS & ELEMENT CHASSIS CONFIG */
+.config-entry-card {
+  border-radius: 12px;
+}
+
+.config-input-sm {
+  border-radius: 6px; 
+  font-size: 0.8rem;
+}
+
+/* 3. ROW TRACK CONSOLE LAYOUT */
+.config-track-row {
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+}
+
+.config-border-visible {
+  border-left: 4px solid #10b981;
+}
+
+.config-border-hidden {
+  border-left: 4px solid #94a3b8;
+}
+
+/* 4. MOTION INTERACTIVE HOVER ANIMATIONS */
+.config-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+.config-card-hover:hover {
+  transform: translateX(2px);
+  background-color: #fafafa !important;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+/* 5. INTERFACE DESIGN UTILITIES */
+.config-custom-placeholder::placeholder {
+  color: rgba(255,255,255,0.4) !important;
+}
+
+.config-btn-xs {
+  padding: 0.25rem 0.4rem;
+  font-size: 0.75rem;
+  border-radius: 6px;
+}
+
+.config-scroll-pane {
+  max-height: 490px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* 6. MINIMAL SYSTEM SCROLLBAR MODULATORS */
+.config-scroll-pane::-webkit-scrollbar {
+  width: 5px;
+}
+
+.config-scroll-pane::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}

@@ -1,0 +1,51 @@
+/* 1. TOP BANNER GRADIENT WRAPPER */
+.songs-hero-banner {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 12px;
+  color: #ffffff;
+}
+
+/* 2. CORE INTERFACE CONTAINER CHASSIS */
+.songs-board-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.songs-compact-input {
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.songs-scroll-box {
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.songs-artwork-thumbnail {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* 3. DYNAMIC TRANSITIONS & INTERACTION MECHANICS */
+.songs-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+.songs-art-hover:hover {
+  transform: scale(1.04);
+}
+
+.songs-select-focus:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 0.15rem rgba(99, 102, 241, 0.25) !important;
+}
+
+/* 4. DESIGN FRAMEWORK EMPTY STATES */
+.songs-dashed-placeholder {
+  border-radius: 12px;
+  min-height: 122px;
+  font-size: 0.85rem;
+}

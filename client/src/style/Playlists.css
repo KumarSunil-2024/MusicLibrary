@@ -1,0 +1,46 @@
+/* 1. TOP BANNER GRADIENT WRAPPER */
+.playlist-hero-banner {
+  background: linear-gradient(135deg, #1e1e38 0%, #2d2d5a 100%);
+  border-radius: 16px;
+}
+
+/* 2. TRANSLUCENT SEARCH CONTROLLER */
+.playlist-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.playlist-search-input:focus {
+  background: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: none !important;
+  outline: none;
+}
+
+/* 3. ROW CARDS AND AUDIO INTERFACES */
+.playlist-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+.playlist-song-row:hover {
+  background-color: #f8fafc !important;
+  transform: translateX(2px);
+}
+
+/* 4. DESIGN ENGINE HELPER TOKENS */
+.font-black {
+  font-weight: 900;
+}
+
+.playlist-btn-xs {
+  font-size: 0.7rem;
+  border-radius: 6px;
+}
+
+/* 5. ACTIVE TRACK AUDIO EMITTERS */
+@keyframes audioPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+.playlist-animate-pulse {
+  animation: audioPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

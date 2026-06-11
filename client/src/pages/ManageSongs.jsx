@@ -1,345 +1,174 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function ManageSongs() {
+  // NAVIGATION ROUTING HOOK INSTANCE
   const navigate = useNavigate();
+
+  // COMPONENT ACTIVE STORAGE STATES
   const [songs, setSongs] = useState([]);
   const [editId, setEditId] = useState(null);
+  const [adminSearch, setAdminSearch] = useState("");
   const [song, setSong] = useState({
-    songName: "",
-    singer: "",
-    albumName: "",
-    musicDirector: "",
-    songUrl: "",
-    image: "",
+    songName: "", singer: "", albumName: "", musicDirector: "", songUrl: "", image: ""
   });
 
-  // 1. SAFE SECURE ROLE CHECK (Runs once immediately)
+  // ROLES VALIDATION SECLUSION CHECK
   useEffect(() => {
     const userString = localStorage.getItem("user");
     const user = userString ? JSON.parse(userString) : null;
-
-    if (!user || user.role !== "ADMIN") {
-      navigate("/dashboard");
-    } else {
-      fetchSongs(); // Load data only if user is an Admin
-    }
+    (!user || user.role !== "ADMIN") ? navigate("/dashboard") : fetchSongs();
   }, [navigate]);
 
-  // 2. EXPLICIT API FETCH WITH DATA-WRAPPING SAFETY GUARDS
+  // FETCH MASTER CATALOGUE RECORDS
   const fetchSongs = async () => {
     try {
       const res = await api.get("/songs/admin/all");
-
-      // 🎯 THE CRITICAL FIX: Extract array safely from { success: true, data: [...] } layout
-      if (res.data && res.data.success && Array.isArray(res.data.data)) {
-        setSongs(res.data.data);
-      } else if (Array.isArray(res.data)) {
-        setSongs(res.data);
-      } else {
-        setSongs([]); // Absolute fallback to shield against map crashes
-      }
+      const data = res.data?.data || res.data || [];
+      setSongs(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("Database connection failed:", err.message);
-      setSongs([]); // Ensure state remains an array even on network drops
+      setSongs([]);
     }
   };
 
-  // 3. VISIBILITY ATTRIBUTE TOGGLE ACTION ROUTINE
-  const handleToggleVisibility = async (songId) => {
+  // MULTI ATTRIBUTE SEARCH FILTER
+  const filteredSongs = useMemo(() => {
+    const term = adminSearch.toLowerCase().trim();
+    return songs.filter(s => !term || 
+      s.songName?.toLowerCase().includes(term) ||
+      s.singer?.toLowerCase().includes(term) ||
+      s.albumName?.toLowerCase().includes(term)
+    );
+  }, [adminSearch, songs]);
+
+  // VISIBILITY ATTRIBUTE TOGGLE ROUTINE
+  const handleToggleVisibility = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await api.put(
-        `/songs/${songId}/visibility`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-
+      const res = await api.put(`/songs/${id}/visibility`);
       if (res.data.success) {
-        // Map alterations dynamically inside our state tracker element
-        setSongs((prevSongs) =>
-          prevSongs.map((track) =>
-            track._id === songId
-              ? { ...track, visibility: res.data.song.visibility }
-              : track,
-          ),
-        );
+        setSongs(prev => prev.map(t => t._id === id ? { ...t, visibility: res.data.song.visibility } : t));
       }
     } catch (err) {
-      alert("Could not modify visibility matrix attributes.");
+      alert("Toggle visibility failed.");
     }
   };
 
-  const handleChange = (e) => {
-    setSong({ ...song, [e.target.name]: e.target.value });
-  };
+  // SYNC INPUT MARKUP VALUE
+  const handleChange = (e) => setSong({ ...song, [e.target.name]: e.target.value });
 
+  // PURGE COMPONENT FORM VALUES
   const resetForm = () => {
-    setSong({
-      songName: "",
-      singer: "",
-      albumName: "",
-      musicDirector: "",
-      songUrl: "",
-      image: "",
-    });
+    setSong({ songName: "", singer: "", albumName: "", musicDirector: "", songUrl: "", image: "" });
     setEditId(null);
   };
 
-  // 4. CLEAN TRACK SAVE LOGIC
+  // COMMIT MODIFIED ASSET ENTRY
   const saveTrack = async (e) => {
     e.preventDefault();
-    if (!song.songName.trim() || !song.singer.trim()) {
-      return alert("Track Title and Artist are required!");
-    }
-
+    if (!song.songName.trim() || !song.singer.trim()) return alert("Name and Singer required!");
     try {
-      if (editId) {
-        await api.put(`/songs/${editId}`, song);
-      } else {
-        await api.post("/songs", song);
-      }
-      alert("Operation completed successfully!");
+      editId ? await api.put(`/songs/${editId}`, song) : await api.post("/songs", song);
       resetForm();
       fetchSongs();
     } catch (err) {
-      alert("Could not update registry.");
+      alert("Registry write failed.");
     }
   };
 
-  // 5. EXPLICIT DELETE TRACK
+  // PERMANENTLY DROP CHOSEN TRACK
   const deleteTrack = async (id) => {
-    if (!window.confirm("Drop this track permanently?")) return;
-
-    try {
-      await api.delete(`/songs/${id}`);
-      fetchSongs();
-    } catch (err) {
-      alert("Failed to delete selected item.");
+    if (window.confirm("Drop this track permanently?")) {
+      try { await api.delete(`/songs/${id}`); fetchSongs(); } catch { alert("Deletion failed."); }
     }
   };
 
+  // POPULATE FORM FIELD ENTRIES
   const startEdit = (item) => {
     setEditId(item._id);
-    setSong({
-      songName: item.songName || "",
-      singer: item.singer || "",
-      albumName: item.albumName || "",
-      musicDirector: item.musicDirector || "",
-      songUrl: item.songUrl || "",
-      image: item.image || "",
-    });
+    setSong({ ...item });
   };
 
   return (
-    <div className="container py-3" style={{ color: "#2c3e50" }}>
-      {/* HEADER SECTION (Fully Responsive Layout) */}
-      <div
-        className="p-3 mb-3 border shadow-sm d-flex flex-column flex-sm-row justify-content-between align-items-sm-center bg-light gap-2"
-        style={{ borderRadius: "10px" }}
-      >
+    <div className="container py-3" style={{ color: "#1e293b", fontFamily: "system-ui" }}>
+      
+      {/* ULTRA-MODERN COMPACT ACTION BANNER */}
+      <div className="p-3 mb-3 text-white d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 shadow-sm"
+           style={{ background: "linear-gradient(135deg, #1e1e35 0%, #2a2a55 100%)", borderRadius: "12px" }}>
         <div>
-          <h4 className="fw-bold m-0">📁 Global Catalog Configuration</h4>
-          <small className="text-muted">
-            Manage song fields using image URLs.
-          </small>
+          <h5 className="fw-bold m-0">🎨 Operations Studio</h5>
+          <small className="text-white-50">Create, publish, or purge core assets</small>
         </div>
-        <div>
-          <span className="badge bg-dark rounded-pill px-3 py-2">
-            Total System Tracks: {Array.isArray(songs) ? songs.length : 0}
-          </span>
+        <div className="d-flex gap-2 w-100 w-sm-auto" style={{ maxWidth: "260px" }}>
+          <input type="text" className="form-control form-control-sm bg-white-10 text-white border-0 px-3 custom-placeholder" 
+                 style={{ borderRadius: "8px", background: "rgba(255,255,255,0.1)" }}
+                 placeholder="Search registry..." value={adminSearch} onChange={(e) => setAdminSearch(e.target.value)} / >
         </div>
       </div>
 
       <div className="row g-3">
-        {/* LEFT COLUMN: FORM PANEL */}
-        <div className="col-lg-4">
-          <form
-            onSubmit={saveTrack}
-            className="card p-3 shadow-sm border bg-white"
-            style={{ borderRadius: "10px" }}
-          >
-            <h6 className="fw-bold mb-2 text-primary">
-              {editId ? "📝 Amending Registry" : "➕ Upload New Track"}
-            </h6>
-            <div
-              className="d-flex flex-column gap-2"
-              style={{ fontSize: "0.82rem" }}
-            >
-              {[
-                "songName",
-                "singer",
-                "albumName",
-                "musicDirector",
-                "songUrl",
-                "image",
-              ].map((field) => (
-                <div key={field}>
-                  <label className="text-muted fw-semibold small text-capitalize">
-                    {field
-                      .replace("Name", " Title")
-                      .replace("Url", " Link")
-                      .replace("image", "Artwork Image URL")}
-                  </label>
-                  <input
-                    type="text"
-                    name={field}
-                    value={song[field]}
-                    onChange={handleChange}
-                    className="form-control form-control-sm border"
-                    placeholder={`Enter track ${field}...`}
-                  />
-                </div>
+        {/* LEFT COMPACT FORM PANEL */}
+        <div className="col-12 col-md-4">
+          <form onSubmit={saveTrack} className="card p-3 border-0 shadow-sm bg-white" style={{ borderRadius: "12px" }}>
+            <h6 className="fw-bold text-primary mb-3">{editId ? "📝 Update Metadata" : "➕ Add New Asset"}</h6>
+            <div className="d-flex flex-column gap-2">
+              {Object.keys(song).map(f => (
+                <input key={f} type="text" name={f} value={song[f]} onChange={handleChange}
+                       className="form-control form-control-sm border-light-subtle py-2" style={{ borderRadius: "6px", fontSize: "0.8rem" }}
+                       placeholder={f.replace("songName","Track Name").replace("singer","Singer").replace("albumName","Album").replace("musicDirector","Director").replace("songUrl","Audio URL").replace("image","Image URL")} />
               ))}
-
-              <div className="d-flex gap-2 mt-2">
-                <button
-                  type="submit"
-                  className={`btn btn-sm fw-bold flex-grow-1 ${editId ? "btn-warning" : "btn-success"}`}
-                >
-                  {editId ? "Apply Changes" : "Save Track"}
-                </button>
-                {editId && (
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-outline-secondary"
-                    onClick={resetForm}
-                  >
-                    Cancel
-                  </button>
-                )}
+              <div className="d-flex gap-1.5 mt-2">
+                <button type="submit" className={`btn btn-sm text-white fw-bold w-100 ${editId ? "btn-warning" : "btn-dark"}`}>{editId ? "Apply" : "Save Asset"}</button>
+                {editId && <button type="button" className="btn btn-sm btn-light border" onClick={resetForm}>Cancel</button>}
               </div>
             </div>
           </form>
         </div>
 
-        {/* RIGHT COLUMN: DATA LIST VIEW */}
-        <div className="col-lg-8">
-          <div
-            className="card border shadow-sm"
-            style={{ borderRadius: "10px", overflow: "hidden" }}
-          >
-            <div className="px-3 py-2 border-bottom bg-light">
-              <h6 className="fw-bold m-0 text-dark">Active Track Registries</h6>
-            </div>
+        {/* RIGHT MODERN GRID CONTAINER */}
+        <div className="col-12 col-md-8">
+          <div className="d-flex flex-column gap-2" style={{ maxHeight: "490px", overflowY: "auto", paddingRight: "4px" }}>
+            {filteredSongs.length === 0 ? (
+              <div className="text-center p-5 text-muted bg-white border rounded-3 small">No matching master track items mapped.</div>
+            ) : (
+              filteredSongs.map((item) => (
+                <div key={item._id} className="d-flex align-items-center justify-content-between p-2 bg-white border-0 shadow-xs rounded-3 transition-all list-card"
+                     style={{ opacity: item.visibility !== false ? 1 : 0.6, borderLeft: item.visibility !== false ? "4px solid #10b981" : "4px solid #94a3b8" }}>
+                  
+                  {/* COMPACT INTERACTIVE MEDIA MODULE */}
+                  <div className="d-flex align-items-center gap-2 style-truncate-box" style={{ minWidth: 0 }}>
+                    <img src={item.image || "https://placehold.co/45"} alt="" style={{ width: "40px", height: "40px", borderRadius: "6px", objectFit: "cover" }} />
+                    <div style={{ minWidth: 0 }}>
+                      <p className="m-0 fw-bold text-dark text-truncate small" style={{ maxWidth: "260px" }}>{item.songName}</p>
+                      <small className="text-muted font-monospace d-block" style={{ fontSize: "0.7rem" }}>{item.singer} • {item.albumName || "Single"}</small>
+                    </div>
+                  </div>
 
-            {/* Table Scroll wrapper */}
-            <div
-              className="card-body p-0 bg-white"
-              style={{ maxHeight: "465px", overflowY: "auto" }}
-            >
-              <div className="table-responsive">
-                <table
-                  className="table table-hover align-middle mb-0"
-                  style={{ fontSize: "0.85rem" }}
-                >
-                  <thead
-                    className="table-light text-uppercase"
-                    style={{ fontSize: "0.75rem" }}
-                  >
-                    <tr>
-                      <th className="ps-3">Track Info</th>
-                      <th>Album</th>
-                      <th className="text-end pe-3">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {!Array.isArray(songs) || songs.length === 0 ? (
-                      <tr>
-                        <td colSpan="3" className="text-center py-4 text-muted">
-                          No song tracks discovered on this node endpoint
-                          registry.
-                        </td>
-                      </tr>
-                    ) : (
-                      songs.map((item) => (
-                        <tr
-                          key={item._id}
-                          // 🎯 VISUAL HINT: Dim hidden items slightly so Admin sees status clearly
-                          style={{
-                            opacity: item.visibility !== false ? 1 : 0.5,
-                            transition: "opacity 0.2s",
-                          }}
-                        >
-                          <td className="ps-3">
-                            <div className="d-flex align-items-center gap-2">
-                              <img
-                                src={item.image || "https://placehold.co/40"}
-                                alt=""
-                                style={{
-                                  width: "34px",
-                                  height: "34px",
-                                  borderRadius: "5px",
-                                  objectFit: "cover",
-                                }}
-                              />
-                              <div style={{ minWidth: 0 }}>
-                                <p
-                                  className="mb-0 fw-bold text-truncate"
-                                  style={{ maxWidth: "180px" }}
-                                >
-                                  {item.songName || "Untitled Track"}
-                                </p>
-                                <small
-                                  className="text-muted text-truncate d-block"
-                                  style={{ maxWidth: "180px" }}
-                                >
-                                  {item.singer || "Unknown Artist"}
-                                </small>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            {item.albumName || "Single"}
-                            <div
-                              className="small text-muted d-block"
-                              style={{ fontSize: "0.65rem" }}
-                            >
-                              {item.visibility !== false
-                                ? "🟢 Visible"
-                                : "🛑 Hidden"}
-                            </div>
-                          </td>
-                          <td className="text-end pe-3">
-                            <div className="d-flex gap-1 justify-content-end">
-                              {/* 🎯 NEW ACTION BUTTON: VISIBILITY TOGGLE INTEGRATION */}
-                              <button
-                                className={`btn btn-xs fw-semibold px-2 py-0.5 btn-sm ${item.visibility !== false ? "btn-outline-secondary" : "btn-success"}`}
-                                style={{ fontSize: "0.7rem" }}
-                                onClick={() => handleToggleVisibility(item._id)}
-                              >
-                                {item.visibility !== false
-                                  ? "👁️ Hide"
-                                  : "👁️ Show"}
-                              </button>
+                  {/* MINIMAL BUTTON ACTION PACKET */}
+                  <div className="d-flex gap-1">
+                    <button className={`btn btn-xs fw-bold px-2.5 py-1 border-0 ${item.visibility !== false ? "btn-light text-secondary" : "btn-success text-white"}`}
+                            style={{ fontSize: "0.7rem", borderRadius: "6px" }} onClick={() => handleToggleVisibility(item._id)}>
+                      {item.visibility !== false ? "🔒 Hide" : "🔓 Show"}
+                    </button>
+                    <button className="btn btn-xs btn-light border shadow-sm px-2.5 py-1" style={{ fontSize: "0.7rem", borderRadius: "6px" }} onClick={() => startEdit(item)}>🔧</button>
+                    <button className="btn btn-xs btn-light border shadow-sm px-2.5 py-1 text-danger" style={{ fontSize: "0.7rem", borderRadius: "6px" }} onClick={() => deleteTrack(item._id)}>🗑️</button>
+                  </div>
 
-                              <button
-                                className="btn btn-sm btn-outline-primary"
-                                onClick={() => startEdit(item)}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="btn btn-sm btn-danger"
-                                onClick={() => deleteTrack(item._id)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
+
+      <style>{`
+        .transition-all { transition: all 0.2s ease-in-out; }
+        .list-card:hover { transform: translateX(2px); background-color: #fafafa !important; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .custom-placeholder::placeholder { color: rgba(255,255,255,0.4) !important; }
+        .btn-xs { padding: 0.25rem 0.4rem; font-size: 0.75rem; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+      `}</style>
     </div>
   );
 }

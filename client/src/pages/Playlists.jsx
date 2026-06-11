@@ -117,49 +117,44 @@ function Playlists() {
   };
 
   return (
-    <div className="container py-3" style={{ color: "#2c3e50" }}>
+    <div className="container py-4" style={{ color: "#1e293b", fontFamily: "system-ui, sans-serif" }}>
       
-      {/* PLAYLIST SECTION TOP HEADER */}
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+      {/* GLOSSY INDIGO HEADER CARD */}
+      <div className="p-4 mb-4 text-white d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 shadow-sm"
+           style={{ background: "linear-gradient(135deg, #1e1e38 0%, #2d2d5a 100%)", borderRadius: "16px" }}>
         <div>
-          <h2 className="fw-bold m-0" style={{ letterSpacing: "-0.5px", color: "#1e3a8a" }}>🎧 My Playlists</h2>
-          <small className="text-muted">Manage and filter your musical collections easily.</small>
+          <h3 className="fw-black m-0 d-flex align-items-center gap-2" style={{ letterSpacing: "-0.5px" }}>
+            <span>📂</span> My Playlist
+          </h3>
+          <p className="m-0 mt-1 text-white-50" style={{ fontSize: "0.85rem" }}>Create custom audio folders and manage tracks</p>
         </div>
-        {/* PLAYLIST FILTER SEARCH INPUT */}
-        <div style={{ maxWidth: "340px", width: "100%" }}>
-          <input 
-            type="text" 
-            className="form-control border shadow-sm" 
-            placeholder="🔍 Search tracks inside..." 
-            value={search} 
-            onChange={(e) => setSearch(e.target.value)} 
-          />
+        <div style={{ maxWidth: "300px", width: "100%" }}>
+          <input type="text" className="form-control form-control-sm border-0 px-3 search-input" 
+                 style={{ borderRadius: "10px", background: "rgba(255,255,255,0.11)", color: "#fff" }}
+                 placeholder="🔍 Search tracks inside..." value={search} onChange={(e) => setSearch(e.target.value)} / >
         </div>
       </div>
 
-      <div className="row g-3">
-        {/* PLAYLIST CREATION BOX CONTAINER */}
-        <div className="col-md-4">
-          <div className="card p-3 shadow-sm border" style={{ backgroundColor: "#f8fafc", borderRadius: "10px" }}>
-            <h6 className="fw-bold mb-2" style={{ color: "#1e3a8a" }}>New Collection</h6>
+      <div className="row g-4">
+        {/* LEFT PANEL: MINIMAL CREATION STUDIO */}
+        <div className="col-12 col-md-4">
+          <div className="card p-3 border-0 shadow-sm bg-white text-center text-sm-start" style={{ borderRadius: "14px" }}>
+            <h6 className="fw-bold mb-3 text-dark">➕ Creat New Playlist</h6>
             <div className="d-flex flex-column gap-2">
-              <input 
-                type="text" 
-                className="form-control form-control-sm border" 
-                placeholder="Playlist Title..." 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
-              />
-              <button className="btn btn-sm btn-success fw-bold py-2" onClick={createPlaylist}>＋ Create Playlist</button>
+              <input type="text" className="form-control border-light-subtle py-2" style={{ borderRadius: "8px", fontSize: "0.85rem" }}
+                     placeholder="New playlist name..." value={name} onChange={(e) => setName(e.target.value)} / >
+              <button className="btn btn-dark fw-bold py-2 shadow-xs" style={{ borderRadius: "8px", fontSize: "0.85rem" }} onClick={createPlaylist}>
+                Create
+              </button>
             </div>
           </div>
         </div>
 
-        {/* CUSTOM PLAYLISTS LIST DISPLAY */}
-        <div className="col-md-8 d-flex flex-column gap-3">
+        {/* RIGHT PANEL: ASYMMETRICAL PLAYLIST DECKS */}
+        <div className="col-12 col-md-8 d-flex flex-column gap-3">
           {playlists.length === 0 ? (
-            <div className="text-center py-4 rounded border border-secondary border-dashed bg-light">
-              <h6 className="m-0 text-muted">No custom playlists created yet.</h6>
+            <div className="text-center py-5 rounded-4 border-2 border-dashed bg-light text-muted small">
+              No custom playlists discovered on this profile node.
             </div>
           ) : (
             playlists.map((p) => {
@@ -168,61 +163,52 @@ function Playlists() {
               );
 
               return (
-                <div key={p._id} className="card border shadow-sm" style={{ borderRadius: "10px", overflow: "hidden" }}>
+                <div key={p._id} className="card border-0 shadow-sm bg-white" style={{ borderRadius: "14px", overflow: "hidden" }}>
                   
-                  {/* COLLECTION CARD ACTION ACTIONS */}
-                  <div className="px-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-light">
-                    <div style={{ minWidth: 0 }} className="me-2">
-                      <h5 className="fw-bold m-0 d-inline-block text-dark text-truncate align-middle" style={{ maxWidth: "160px" }}>{p.name}</h5>
-                      <span className="badge bg-secondary rounded-pill ms-2 align-middle" style={{ fontSize: "0.7rem" }}>{p.songs.length} items</span>
+                  {/* COLLECTION CARD HEADER ACCENT */}
+                  <div className="px-3 py-2.5 d-flex justify-content-between align-items-center bg-light border-0">
+                    <div style={{ minWidth: 0 }}>
+                      <span className="fw-bold text-dark h6 m-0 text-truncate d-inline-block align-middle" style={{ maxWidth: "200px" }}>{p.name}</span>
+                      <span className="badge bg-secondary-subtle text-secondary rounded-pill ms-2 align-middle" style={{ fontSize: "0.65rem" }}>{p.songs.length} audio</span>
                     </div>
-                    <div className="d-flex gap-1 flex-shrink-0">
-                      <button className="btn btn-sm btn-outline-primary py-0.5 px-2" style={{ fontSize: "0.75rem" }} onClick={() => renamePlaylist(p._id)}>Rename</button>
-                      <button className="btn btn-sm btn-danger py-0.5 px-2" style={{ fontSize: "0.75rem" }} onClick={() => deletePlaylist(p._id)}>Delete</button>
+                    <div className="d-flex gap-1">
+                      <button className="btn btn-xs btn-white border shadow-xs text-primary px-2.5 py-1 fw-semibold" onClick={() => renamePlaylist(p._id)}>✏️</button>
+                      <button className="btn btn-xs btn-white border shadow-xs text-danger px-2.5 py-1 fw-semibold" onClick={() => deletePlaylist(p._id)}>🗑️</button>
                     </div>
                   </div>
 
-                  {/* RENDER INDIVIDUAL TRACK ITEMS */}
-                  <div className="card-body p-2 bg-white">
+                  {/* RENDER INDIVIDUAL ROW STREAM NODES */}
+                  <div className="p-2 bg-white">
                     {localFilteredSongs.length === 0 ? (
-                      <p className="text-muted m-0 py-2 text-center" style={{ fontSize: "0.85rem" }}>No matching songs found</p>
+                      <p className="text-muted m-0 py-3 text-center small">No tracking audio matches available.</p>
                     ) : (
                       localFilteredSongs.map((song, idx) => {
                         const isCurrent = currentSong?.trackId === song.trackId;
                         
                         return (
-                          <div 
-                            key={`${p._id}-${song.trackId || idx}`} 
-                            className="d-flex justify-content-between align-items-center p-1 rounded mb-1 border-bottom"
-                            onClick={() => setCurrentSong(song)}
-                            style={{ 
-                              cursor: "pointer", 
-                              backgroundColor: isCurrent ? "#edf2f7" : "transparent"
-                            }}
-                          >
-                            <div className="d-flex align-items-center gap-2 text-truncate flex-grow-1">
-                              <small className={`${isCurrent ? "text-primary fw-bold" : "text-muted"} text-center`} style={{ width: "25px" }}>
+                          <div key={`${p._id}-${song.trackId || idx}`} onClick={() => setCurrentSong(song)}
+                               className="d-flex justify-content-between align-items-center p-2 rounded-3 mb-1 transition-all song-row"
+                               style={{ cursor: "pointer", backgroundColor: isCurrent ? "#f1f5f9" : "transparent" }}>
+                            
+                            <div className="d-flex align-items-center gap-2.5 text-truncate flex-grow-1" style={{ minWidth: 0 }}>
+                              <small className={`text-center font-monospace ${isCurrent ? "text-success fw-bold animate-pulse" : "text-muted"}`} style={{ width: "20px", fontSize: "0.8rem" }}>
                                 {isCurrent ? "▶" : idx + 1}
                               </small>
                               
                               <img src={song.artworkUrl} alt="" style={{ width: "36px", height: "36px", borderRadius: "6px", objectFit: "cover" }} />
                               
-                              <div className="text-truncate" style={{ minWidth: 0 }}>
-                                <p className={`mb-0 fw-bold text-truncate ${isCurrent ? "text-primary" : "text-dark"}`} style={{ fontSize: "0.85rem", lineHeight: "1.2" }}>{song.trackName}</p>
-                                <small className="text-muted d-block text-truncate" style={{ fontSize: "0.75rem" }}>{song.artistName}</small>
+                              <div style={{ minWidth: 0 }}>
+                                <p className={`m-0 fw-bold text-truncate ${isCurrent ? "text-success" : "text-dark"}`} style={{ fontSize: "0.85rem", lineHeight: "1.2" }}>{song.trackName}</p>
+                                <small className="text-muted d-block text-truncate" style={{ fontSize: "0.72rem" }}>{song.artistName}</small>
                               </div>
                             </div>
                             
-                            {/* REMOVE SONG FROM COLLECTION */}
-                            <button 
-                              className="btn btn-sm btn-link text-decoration-none text-danger p-0 px-2 flex-shrink-0" 
-                              style={{ fontSize: "0.75rem" }} 
-                              onClick={(e) => { 
-                                e.stopPropagation(); 
-                                removeSongFromPlaylist(p._id, song._id || song.trackId);
-                              }}
-                            >
-                              Remove
+                            <button className="btn btn-sm text-decoration-none text-danger border-0 opacity-75 hover-reveal px-2" style={{ fontSize: "0.7rem", fontWeight: "600" }} 
+                                    onClick={(e) => { 
+                                      e.stopPropagation(); 
+                                      removeSongFromPlaylist(p._id, song._id || song.trackId);
+                                    }}>
+                              Delete
                             </button>
                           </div>
                         );
@@ -235,10 +221,22 @@ function Playlists() {
             })
           )}
           
-          {/* HOOK TARGET PLAYBACK CONSOLE */}
+          {/* FLOATING REAL-TIME MEDIA HUB PLAYBACK */}
           <MusicPlayer currentSong={currentSong} nextSong={() => shiftTrack(1)} previousSong={() => shiftTrack(-1)} />
         </div>
       </div>
+
+      {/* COMPONENT GLOBAL HOVER TRANSFORM INTERFACES */}
+      <style>{`
+        .transition-all { transition: all 0.2s ease-in-out; }
+        .song-row:hover { background-color: #f8fafc !important; transform: translateX(2px); }
+        .search-input::placeholder { color: rgba(255,255,255,0.4) !important; }
+        .search-input:focus { background: rgba(255,255,255,0.16) !important; box-shadow: none !important; outline: none; }
+        .fw-black { font-weight: 900; }
+        .btn-xs { font-size: 0.7rem; border-radius: 6px; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+      `}</style>
     </div>
   );
 }

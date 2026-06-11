@@ -106,17 +106,39 @@ function Songs() {
   };
 
   return (
-    <div className="container py-3" style={{ color: "#2c3e50" }}>
+    <div className="container py-3" style={{ color: "#1e293b", fontFamily: "sans-serif" }}>
+      
+      {/* MINIMAL COMPACT HERO BANNER */}
+      <div
+        className="p-3 mb-3 shadow-sm d-flex justify-content-between align-items-center"
+        style={{ 
+          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", 
+          borderRadius: "12px",
+          color: "#ffffff"
+        }}
+      >
+        <div>
+          <h5 className="fw-bold m-0 d-flex align-items-center gap-2">
+            <span>🎵</span> Audio Library
+          </h5>
+        </div>
+        <div>
+          <span className="badge bg-light text-dark fw-bold px-2 py-1" style={{ borderRadius: "6px", fontSize: "0.75rem" }}>
+            {filteredSongs.length} Tracks
+          </span>
+        </div>
+      </div>
+
       <div className="row g-3">
         
-        {/* LEFT COLUMN DISCOVERY PANEL */}
-        <div className="col-12 col-md-4">
-          <div className="card shadow-sm border">
-            <div className="p-2 border-bottom">
-              <h6 className="fw-bold m-0">🎵 Music Discovery</h6>
+        {/* LEFT COLUMN COMPACT PANEL */}
+        <div className="col-12 col-lg-4">
+          <div className="card border-0 shadow-sm bg-white" style={{ borderRadius: "12px", overflow: "hidden" }}>
+            <div className="px-3 py-2 border-bottom bg-light">
+              <h6 className="fw-bold m-0 small text-dark">🎧 Explorer</h6>
             </div>
 
-            <div style={{ maxHeight: "360px", overflowY: "auto", padding: "4px" }}>
+            <div style={{ maxHeight: "380px", overflowY: "auto", padding: "4px" }}>
               <SidebarSongs
                 songs={filteredSongs}
                 currentSong={currentSong}
@@ -127,7 +149,8 @@ function Songs() {
         </div>
 
         {/* RIGHT COLUMN DETAILS SYSTEM */}
-        <div className="col-12 col-md-8 d-flex flex-column gap-3">
+        <div className="col-12 col-lg-8 d-flex flex-column gap-2">
+          
           <SearchBar
             search={search}
             setSearch={setSearch}
@@ -139,42 +162,36 @@ function Songs() {
             searchSongs={() => {}}
           />
 
-          {/* DYNAMIC CARD VIEW DETAILS */}
+          {/* DYNAMIC METADATA CARD VIEW */}
           {currentSong ? (
-            <div className="card border shadow-sm">
-              <div className="card-body">
-                <div className="d-flex flex-column flex-sm-row gap-3">
+            <div className="card border-0 shadow-sm bg-white" style={{ borderRadius: "12px", overflow: "hidden" }}>
+              <div className="card-body p-3">
+                <div className="d-flex gap-3 align-items-center">
+                  
                   <img
                     src={currentSong.artworkUrl100}
                     alt=""
-                    style={{ width: "110px", height: "110px", objectFit: "cover", borderRadius: "8px" }}
+                    className="shadow-sm transition-all style-art"
+                    style={{ width: "90px", height: "90px", objectFit: "cover", borderRadius: "10px" }}
                   />
 
-                  <div className="flex-grow-1">
-                    <h4 className="fw-bold text-dark mb-2">
-                      {currentSong.trackName}
-                    </h4>
-
-                    <p className="mb-1 text-secondary" style={{ fontSize: "0.95rem" }}>
-                      <strong>Singer:</strong> {currentSong.artistName}
+                  <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                    <h5 className="fw-bold text-dark mb-1 text-truncate">{currentSong.trackName}</h5>
+                    
+                    {/* INLINE COMPACT DETAILS ROW */}
+                    <p className="text-muted mb-2 text-truncate" style={{ fontSize: "0.8rem" }}>
+                      🎤 {currentSong.artistName} • 💿 {currentSong.collectionName} • 🎼 {currentSong.musicDirector}
                     </p>
 
-                    <p className="mb-1 text-secondary" style={{ fontSize: "0.95rem" }}>
-                      <strong>Album Title:</strong> {currentSong.collectionName}
-                    </p>
-
-                    <p className="mb-3 text-secondary" style={{ fontSize: "0.95rem" }}>
-                      <strong>Music Director:</strong> {currentSong.musicDirector}
-                    </p>
-
-                    {/* SELECTION ASSIGNMENT DROPDOWN PANEL */}
-                    <div className="d-flex gap-2" style={{ maxWidth: "340px" }}>
+                    {/* COMPACT PLAYLIST INTERFACE */}
+                    <div className="d-flex gap-2" style={{ maxWidth: "280px" }}>
                       <select
-                        className="form-select form-select-sm"
+                        className="form-select form-select-sm border shadow-sm style-select"
+                        style={{ borderRadius: "6px", fontSize: "0.8rem" }}
                         value={playlistId}
                         onChange={(e) => setPlaylistId(e.target.value)}
                       >
-                        <option value="">Select Playlist</option>
+                        <option value="">Add to Playlist</option>
                         {playlists.map((playlist) => (
                           <option key={playlist._id} value={playlist._id}>
                             {playlist.name}
@@ -182,7 +199,7 @@ function Songs() {
                         ))}
                       </select>
 
-                      <button className="btn btn-sm btn-success px-3" onClick={addSongToPlaylist}>
+                      <button className="btn btn-sm btn-success fw-bold px-3 shadow-sm" style={{ borderRadius: "6px", fontSize: "0.8rem" }} onClick={addSongToPlaylist}>
                         Add
                       </button>
                     </div>
@@ -191,12 +208,14 @@ function Songs() {
               </div>
             </div>
           ) : (
-            <div className="card p-4 text-center text-muted bg-light">
-              No Song Selected
+            <div 
+              className="card p-4 text-center text-muted d-flex align-items-center justify-content-center border-2 border-dashed bg-light"
+              style={{ borderRadius: "12px", minHeight: "122px", fontSize: "0.85rem" }}
+            >
+              Select a track from the sidebar to display playback details.
             </div>
           )}
 
-          {/* ATTACH MEDIA AUDIO PLAYER */}
           <MusicPlayer
             currentSong={currentSong}
             nextSong={() => shiftTrack(1)}
@@ -205,6 +224,12 @@ function Songs() {
         </div>
 
       </div>
+
+      <style>{`
+        .transition-all { transition: all 0.2s ease-in-out; }
+        .style-art:hover { transform: scale(1.04); }
+        .style-select:focus { border-color: #6366f1 !important; box-shadow: 0 0 0 0.15rem rgba(99, 102, 241, 0.25) !important; }
+      `}</style>
     </div>
   );
 }

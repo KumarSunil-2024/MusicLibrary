@@ -1,0 +1,53 @@
+/* 1. HERO BANNER BACKGROUND GRADIENT CHASSIS */
+.admin-hero-banner {
+  background: linear-gradient(135deg, #1e1e38 0%, #2d2d5a 100%);
+  border-radius: 16px;
+  color: #ffffff;
+}
+
+/* 2. CORE INTERFACE CARD BASES */
+.admin-board-card {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.admin-metric-card {
+  border-radius: 12px;
+}
+
+.admin-list-item {
+  background-color: #f8fafc;
+  border-radius: 8px;
+}
+
+/* 3. DYNAMIC TRANSITIONS & HOVER STATES */
+.admin-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+.admin-item-hover:hover {
+  background-color: #f1f5f9 !important;
+  transform: translateY(-1px);
+}
+
+/* 4. TYPOGRAPHY WEIGHT MODIFIERS */
+.font-extrabold {
+  font-weight: 800;
+}
+
+.font-black {
+  font-weight: 900;
+}
+
+/* 5. TEXT TRUNCATION CONTROLLERS */
+.admin-text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 6. UTILITY SCROLLBAR ADJUSTMENTS */
+.admin-scroll-box {
+  max-height: 420px;
+  overflow-y: auto;
+}
